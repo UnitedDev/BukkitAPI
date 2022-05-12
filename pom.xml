@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>bukkitapi</groupId>
-    <artifactId>BukkitAPI</artifactId>
+    <groupId>fr.kohei</groupId>
+    <artifactId>bukkitapi</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -17,6 +17,10 @@
         <repository>
             <id>cloudnet</id>
             <url>https://repo.cloudnetservice.eu/repository/releases/</url>
+        </repository>
+        <repository>
+            <id>kohei</id>
+            <url>https://maven.pkg.github.com/KoheiDev/BukkitAPI</url>
         </repository>
     </repositories>
 
@@ -56,8 +60,8 @@
     <distributionManagement>
         <repository>
             <id>kohei</id>
-                <name>Common</name>
-            <url>https://maven.pkg.github.com/KoheiDev/Common/</url>
+            <name>BukkitAPI</name>
+            <url>https://maven.pkg.github.com/KoheiDev/BukkitAPI/</url>
         </repository>
     </distributionManagement>
 
