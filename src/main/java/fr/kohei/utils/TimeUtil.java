@@ -190,6 +190,17 @@ public class TimeUtil {
         return (days > 0 ? (days + " jour(s) ") : "") + (hours % 24 > 0 ? (hours % 24 + " heure(s) ") : "") + (minutes % 60 > 0 ? (minutes % 60 + " minute(s) ") : "") + (seconds % 60 > 0 ? (seconds % 60 + " seconde(s)") : "");
     }
 
+    public static String getReallyNiceTime2(long duration) {
+        if (duration == -2) return "Indéterminé";
+        if (duration == -1) return "Permanent";
+
+        long seconds = duration / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        long days = hours / 24;
+        return (days > 0 ? (days + "j ") : "") + (hours % 24 > 0 ? (hours % 24 + "h ") : "") + (minutes % 60 > 0 ? (minutes % 60 + "m ") : "") + (seconds % 60 > 0 ? (seconds % 60 + "s ") : "");
+    }
+
     public static String millisToSmallRoundedTime(long millis) {
         ++millis;
         long seconds = millis / 1000L;

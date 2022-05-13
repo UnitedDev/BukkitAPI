@@ -6,10 +6,13 @@ import com.google.common.io.ByteStreams;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import fr.kohei.command.CommandHandler;
-import fr.kohei.commands.ModCommands;
+import fr.kohei.command.impl.ModCommands;
+import fr.kohei.command.impl.PlayerCommands;
 import fr.kohei.common.api.CommonAPI;
 import fr.kohei.common.cache.Division;
 import fr.kohei.common.cache.ProfileData;
+import fr.kohei.manager.ChatReportManager;
+import fr.kohei.manager.PunishmentManager;
 import fr.kohei.manager.ServerCache;
 import fr.kohei.menu.MenuAPI;
 import fr.kohei.messaging.Pidgin;
@@ -41,11 +44,9 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     @Getter
     private static CommonAPI commonAPI;
     @Getter
-    @Setter
-    private static int normalPlayers;
+    private static ChatReportManager chatReportManager;
     @Getter
-    @Setter
-    private static int totalPlayers;
+    private static PunishmentManager punishmentManager;
 
     @Override
     public void onEnable() {
@@ -59,15 +60,14 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         commandHandler = new CommandHandler(plugin);
         messaging = new Pidgin("dev", new JedisPool("localhost"));
         serverCache = new ServerCache(plugin);
+        chatReportManager = new ChatReportManager();
+        punishmentManager = new PunishmentManager();
 
         plugin.getServer().getPluginManager().registerEvents(new CustomItemListener(plugin), plugin);
-
         this.loadRedis();
+        this.registerCommands();
 
         this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 5 * 20);
-
-        commandHandler.registerClass(ModCommands.class);
-
         new TabListTask(this).runTaskTimer(this, 0, 20);
     }
 
@@ -77,11 +77,9 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
                 .findFirst().orElse(null);
     }
 
-    public static void sendToServer(Player player, String server) {
-        final ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Connect");
-        out.writeUTF(server);
-        player.sendPluginMessage(getPlugin(), "BungeeCord", out.toByteArray());
+    public void registerCommands() {
+        commandHandler.registerClass(ModCommands.class);
+        commandHandler.registerClass(PlayerCommands.class);
     }
 
     private void loadRedis() {
@@ -91,12 +89,16 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         getMessaging().registerPacket(ServerDeletePacket.class);
         getMessaging().registerPacket(CTFUpdatePacket.class);
         getMessaging().registerPacket(ProfileUpdatePacket.class);
+        getMessaging().registerPacket(PunishmentAskPacket.class);
+        getMessaging().registerPacket(PunishmentPacket.class);
 
         getMessaging().registerListener(new LobbyUpdateSubscriber());
         getMessaging().registerListener(new CTFUpdateSubscriber());
         getMessaging().registerListener(new UHCUpdateSubscriber());
         getMessaging().registerListener(new CountUpdateSubscriber());
         getMessaging().registerListener(new ServerDeleteSubscriber());
+        getMessaging().registerListener(new PunishmentAskSubscriber());
+        getMessaging().registerListener(new PunishmentSubscriber());
     }
 
     public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
@@ -105,6 +107,13 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         }
         final ByteArrayDataInput in = ByteStreams.newDataInput(message);
         in.readUTF();
+    }
+
+    public static void sendToServer(Player player, String server) {
+        final ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Connect");
+        out.writeUTF(server);
+        player.sendPluginMessage(getPlugin(), "BungeeCord", out.toByteArray());
     }
 
     public static void changeExperience(Player player, int add, String reason) {
@@ -134,4 +143,10 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         return Division.values()[(division.ordinal() + 1) % Division.values().length];
     }
 
+    @Getter
+    @Setter
+    private static int normalPlayers;
+    @Getter
+    @Setter
+    private static int totalPlayers;
 }

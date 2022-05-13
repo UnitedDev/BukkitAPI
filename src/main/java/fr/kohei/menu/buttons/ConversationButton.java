@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.function.BiConsumer;
 
 public class ConversationButton<T> extends Button {
-
     final ItemStack item;
     final String message;
     final T target;
@@ -24,7 +23,6 @@ public class ConversationButton<T> extends Button {
         this.target = target;
         this.action = action;
     }
-
 
     @Override
     public ItemStack getButtonItem(Player p0) {

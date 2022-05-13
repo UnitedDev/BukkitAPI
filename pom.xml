@@ -28,7 +28,7 @@
         <dependency>
             <groupId>fr.kohei</groupId>
             <artifactId>common</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -53,7 +53,13 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>4.1.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.17.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -64,5 +70,42 @@
             <url>https://maven.pkg.github.com/KoheiDev/BukkitAPI/</url>
         </repository>
     </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
 
 </project>

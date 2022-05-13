@@ -18,15 +18,15 @@ public class TabListTask extends BukkitRunnable {
     @Override
     public void run() {
         String header =
-                "&c" + "\n" +
-                "&c&l■ &8┃ &c&lKoheiMC &8● &6Network UHC &8&l» &7&o%online_players%&8/&7&o1000 &8┃ &c&l■" + "\n" +
-                "&8» &7Serveur &8● &c%server% &8«" + "\n" +
-                "&c";
+                "&6" + "\n" +
+                "&6&l■ &8┃ &6&lKoheiMC &8● &6Network UHC &8&l» &7&o%online_players%&8/&7&o1000 &8┃ &6&l■" + "\n" +
+                "&8» &7Serveur &8● &6%server% &8«" + "\n" +
+                "&6";
         String footer =
-                "&c" + "\n" +
+                "&6" + "\n" +
                 "&7Discord &8&l» &9discord.gg/kohei" + "\n" +
                 "&7Twitter &8&l» &b@KoheiNetwork" + "\n" +
-                "&c";
+                "&6";
         Bukkit.getOnlinePlayers().forEach(player -> TabList.send(player, replace(header), replace(footer)));
     }
 

@@ -28,6 +28,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -311,7 +312,11 @@ public class CommandHandler implements Listener {
         if (evalCommand(event.getSender(), event.getCommand()) != null) {
             event.setCancelled(true);
         }
+    }
 
+    @EventHandler
+    public void onKick(PlayerKickEvent event) {
+        if(event.getReason().equalsIgnoreCase("disconnect.spam")) event.setCancelled(true);
     }
 
     public static class SimpleCommand extends org.bukkit.command.Command {
@@ -388,7 +393,7 @@ public class CommandHandler implements Listener {
 
         TextComponent text = new TextComponent("§c⚠ ");
         text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName()))}));
-        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport " + player.getName() + " " + message));
+        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + player.getName() + " message:" + message));
         String finalMessage = message;
 
         Bukkit.getOnlinePlayers().forEach(player1 -> player1.spigot().sendMessage(text, new TextComponent(

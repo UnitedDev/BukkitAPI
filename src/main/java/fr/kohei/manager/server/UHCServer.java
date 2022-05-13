@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class UHCServer {
     private final int pvpTimer;
     private final int borderTimer;
     private final List<String> enabledScenarios;
+    private final List<UUID> uuids;
 
     @Getter
     @RequiredArgsConstructor
