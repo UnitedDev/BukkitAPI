@@ -7,15 +7,17 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.CompletableFuture;
 
 public class TabList {
 
-        public static void send(Player player, String header, String footer){
+    public static void send(Player player, String header, String footer) {
 
+        CompletableFuture.runAsync(() -> {
             CraftPlayer craftplayer = (CraftPlayer) player;
             PlayerConnection connection = craftplayer.getHandle().playerConnection;
-            IChatBaseComponent headerJSON = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + header +"\"}");
-            IChatBaseComponent footerJSON = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + footer +"\"}");
+            IChatBaseComponent headerJSON = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + header + "\"}");
+            IChatBaseComponent footerJSON = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + footer + "\"}");
             PacketPlayOutPlayerListHeaderFooter packet = new PacketPlayOutPlayerListHeaderFooter();
 
             try {
@@ -33,6 +35,7 @@ public class TabList {
             }
 
             connection.sendPacket(packet);
-        }
-
+        });
     }
+
+}

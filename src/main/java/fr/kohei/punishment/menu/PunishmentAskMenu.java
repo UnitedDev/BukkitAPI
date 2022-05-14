@@ -1,5 +1,6 @@
 package fr.kohei.punishment.menu;
 
+import fr.kohei.BukkitAPI;
 import fr.kohei.common.cache.PunishmentData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.GlassMenu;
@@ -69,7 +70,7 @@ public class PunishmentAskMenu extends GlassMenu {
         }
     }
 
-    private static class ConfirmationButton extends Button {
+    private class ConfirmationButton extends Button {
         @Override
         public ItemStack getButtonItem(Player p0) {
             return new ItemBuilder(Material.SLIME_BALL).setName("&a&lConfirmer").setLore(
@@ -80,6 +81,7 @@ public class PunishmentAskMenu extends GlassMenu {
 
         @Override
         public void clicked(Player player, int slot, ClickType clickType, int hotbarButton) {
+            BukkitAPI.getPunishmentManager().ask(player, data, preuve);
             player.closeInventory();
         }
     }

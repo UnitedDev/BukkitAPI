@@ -35,8 +35,10 @@ public class PunishmentCategoryMenu extends PaginatedMenu {
     public Map<Integer, Button> getAllPagesButtons(Player p0) {
         Map<Integer, Button> buttons = new HashMap<>();
 
+        int i = 5;
+
         for (Punishments.PunishCategory value : Punishments.PunishCategory.values()) {
-            buttons.put(buttons.size(), new CategoryButton(value));
+            buttons.put(i++, new CategoryButton(value));
         }
 
         return buttons;
@@ -48,7 +50,7 @@ public class PunishmentCategoryMenu extends PaginatedMenu {
 
         @Override
         public ItemStack getButtonItem(Player p0) {
-            return new ItemBuilder(Material.BOOK).setName("&c" + category.getDisplay()).setLore(
+            return new ItemBuilder(category.getMaterial()).setName("&c" + category.getDisplay()).setLore(
                     "&fPermet d'accéder à tous les sanctions de",
                     "&fla catégorie &c" + category.getDisplay(),
                     "",

@@ -1,7 +1,7 @@
-package fr.kohei.messaging.list.packet;
+package fr.kohei.messaging.packet;
 
 import fr.kohei.common.cache.PunishmentData;
-import fr.kohei.messaging.pigdin.Packet;
+import fr.kohei.common.messaging.pigdin.Packet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,5 +11,6 @@ public class PunishmentPacket implements Packet {
 
     private final PunishmentData data;
     private final String accepter;
+    private final boolean announce;
 
 }

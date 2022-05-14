@@ -1,6 +1,6 @@
-package fr.kohei.messaging.list.packet;
+package fr.kohei.messaging.packet;
 
-import fr.kohei.messaging.pigdin.Packet;
+import fr.kohei.common.messaging.pigdin.Packet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

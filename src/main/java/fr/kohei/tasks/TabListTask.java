@@ -19,7 +19,7 @@ public class TabListTask extends BukkitRunnable {
     public void run() {
         String header =
                 "&6" + "\n" +
-                "&6&l■ &8┃ &6&lKoheiMC &8● &6Network UHC &8&l» &7&o%online_players%&8/&7&o1000 &8┃ &6&l■" + "\n" +
+                "&e  &6&l■ &8┃ &6&lKoheiMC &8● &6Network UHC &8&l» &7&o%online_players%&8/&7&o1000 &8┃ &6&l■" + "\n" +
                 "&8» &7Serveur &8● &6%server% &8«" + "\n" +
                 "&6";
         String footer =

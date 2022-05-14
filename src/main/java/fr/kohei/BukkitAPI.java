@@ -15,9 +15,8 @@ import fr.kohei.manager.ChatReportManager;
 import fr.kohei.manager.PunishmentManager;
 import fr.kohei.manager.ServerCache;
 import fr.kohei.menu.MenuAPI;
-import fr.kohei.messaging.Pidgin;
-import fr.kohei.messaging.list.packet.*;
-import fr.kohei.messaging.list.subscriber.*;
+import fr.kohei.messaging.packet.*;
+import fr.kohei.messaging.subscriber.*;
 import fr.kohei.tasks.TabListTask;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.item.CustomItemListener;
@@ -25,9 +24,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import redis.clients.jedis.JedisPool;
 
 public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
 
@@ -37,8 +36,6 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     private static MenuAPI menuAPI;
     @Getter
     private static CommandHandler commandHandler;
-    @Getter
-    private static Pidgin messaging;
     @Getter
     private static ServerCache serverCache;
     @Getter
@@ -58,7 +55,6 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         commonAPI = CommonAPI.create();
         menuAPI = new MenuAPI(plugin);
         commandHandler = new CommandHandler(plugin);
-        messaging = new Pidgin("dev", new JedisPool("localhost"));
         serverCache = new ServerCache(plugin);
         chatReportManager = new ChatReportManager();
         punishmentManager = new PunishmentManager();
@@ -66,6 +62,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         plugin.getServer().getPluginManager().registerEvents(new CustomItemListener(plugin), plugin);
         this.loadRedis();
         this.registerCommands();
+        this.registerListeners();
 
         this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 5 * 20);
         new TabListTask(this).runTaskTimer(this, 0, 20);
@@ -77,28 +74,24 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
                 .findFirst().orElse(null);
     }
 
-    public void registerCommands() {
+    private void registerListeners() {
+        PluginManager pluginManager = this.getServer().getPluginManager();
+    }
+
+    private void registerCommands() {
         commandHandler.registerClass(ModCommands.class);
         commandHandler.registerClass(PlayerCommands.class);
     }
 
     private void loadRedis() {
-        getMessaging().registerPacket(LobbyUpdatePacket.class);
-        getMessaging().registerPacket(UHCUpdatePacket.class);
-        getMessaging().registerPacket(CountUpdatePacket.class);
-        getMessaging().registerPacket(ServerDeletePacket.class);
-        getMessaging().registerPacket(CTFUpdatePacket.class);
-        getMessaging().registerPacket(ProfileUpdatePacket.class);
-        getMessaging().registerPacket(PunishmentAskPacket.class);
-        getMessaging().registerPacket(PunishmentPacket.class);
-
-        getMessaging().registerListener(new LobbyUpdateSubscriber());
-        getMessaging().registerListener(new CTFUpdateSubscriber());
-        getMessaging().registerListener(new UHCUpdateSubscriber());
-        getMessaging().registerListener(new CountUpdateSubscriber());
-        getMessaging().registerListener(new ServerDeleteSubscriber());
-        getMessaging().registerListener(new PunishmentAskSubscriber());
-        getMessaging().registerListener(new PunishmentSubscriber());
+        commonAPI.getMessaging().registerAdapter(LobbyUpdatePacket.class, new LobbyUpdateSubscriber());
+        commonAPI.getMessaging().registerAdapter(UHCUpdatePacket.class, new UHCUpdateSubscriber());
+        commonAPI.getMessaging().registerAdapter(CountUpdatePacket.class, new CountUpdateSubscriber());
+        commonAPI.getMessaging().registerAdapter(ServerDeletePacket.class, new ServerDeleteSubscriber());
+        commonAPI.getMessaging().registerAdapter(CTFUpdatePacket.class, new CTFUpdateSubscriber());
+        commonAPI.getMessaging().registerAdapter(PunishmentAskPacket.class, new PunishmentAskSubscriber());
+        commonAPI.getMessaging().registerAdapter(PunishmentPacket.class, new PunishmentSubscriber());
+        commonAPI.getMessaging().registerAdapter(UpdatePlayersPacket.class, new UpdatePlayersSubscriber());
     }
 
     public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {

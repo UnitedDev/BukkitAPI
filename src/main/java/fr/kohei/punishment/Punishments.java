@@ -104,12 +104,13 @@ public enum Punishments {
     @Getter
     @RequiredArgsConstructor
     public enum PunishCategory {
-        ABUSE("Abus"),
-        CHEAT("Cheat"),
-        GAMEPLAY("Gameplay"),
-        CHAT_IN_GAME("Chat Textuel"),
-        VOICE_CHAT("Chat Vocal");
+        ABUSE(Material.BARRIER, "Abus"),
+        CHEAT(Material.IRON_SWORD, "Cheat"),
+        GAMEPLAY(Material.FISHING_ROD, "Gameplay"),
+        CHAT_IN_GAME(Material.PAPER, "Chat Textuel"),
+        VOICE_CHAT(Material.ENDER_PEARL, "Chat Vocal");
 
+        private final Material material;
         private final String display;
     }
 

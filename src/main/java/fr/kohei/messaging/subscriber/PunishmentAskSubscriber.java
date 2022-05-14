@@ -1,11 +1,12 @@
-package fr.kohei.messaging.list.subscriber;
+package fr.kohei.messaging.subscriber;
 
+import com.google.common.io.BaseEncoding;
 import fr.kohei.BukkitAPI;
 import fr.kohei.common.RedisProvider;
 import fr.kohei.common.cache.ProfileData;
-import fr.kohei.messaging.list.packet.PunishmentAskPacket;
-import fr.kohei.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.messaging.pigdin.PacketListener;
+import fr.kohei.messaging.packet.PunishmentAskPacket;
+import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.messaging.pigdin.PacketListener;
 import fr.kohei.utils.ChatUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -13,20 +14,17 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import javax.print.attribute.standard.RequestingUserName;
+import java.util.UUID;
 
 public class PunishmentAskSubscriber implements PacketListener {
 
     @IncomingPacketHandler
     public void onReceive(PunishmentAskPacket packet) {
-        OfflinePlayer executor = Bukkit.getOfflinePlayer(packet.getExecutor());
-        OfflinePlayer target = Bukkit.getOfflinePlayer(packet.getPunishmentData().getPunished());
+        ProfileData executorProfile = BukkitAPI.getCommonAPI().getProfile(packet.getExecutor());
+        ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(packet.getPunishmentData().getPunished());
 
-        ProfileData executorProfile = BukkitAPI.getCommonAPI().getProfile(executor.getUniqueId());
-        ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(target.getUniqueId());
-
-        String executorDisplay = executorProfile.getRank().getTabPrefix().substring(0, 2) + executor.getName();
-        String targetDisplay = targetProfile.getRank().getTabPrefix().substring(0, 2) + target.getName();
+        String executorDisplay = executorProfile.getRank().getTabPrefix().substring(0, 2) + executorProfile.getDisplayName();
+        String targetDisplay = targetProfile.getRank().getTabPrefix().substring(0, 2) + targetProfile.getDisplayName();
 
         Bukkit.getOnlinePlayers().forEach(player -> {
             ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
@@ -39,13 +37,15 @@ public class PunishmentAskSubscriber implements PacketListener {
             accept.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                     new TextComponent(ChatUtil.translate("&c⚠ &cAttention: &cVous devez vous assurer que la sanction a lieu d'être ! Si ce n'est pas le cas, vous serez tenu comme responsable."))
             }));
-            accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/acceptban " + RedisProvider.redisProvider.GSON.toJson(packet)));
+            UUID random = UUID.randomUUID();
+            BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(random, RedisProvider.redisProvider.GSON.toJson(packet));
+            accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/acceptban " + random));
 
             TextComponent decline = new TextComponent(ChatUtil.translate("&c&l[REFUSER]"));
             decline.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                     new TextComponent(ChatUtil.translate("&c⚠ Action effectuée au clic"))
             }));
-            decline.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/declineban " + RedisProvider.redisProvider.GSON.toJson(packet)));
+            decline.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/declineban " + random));
 
             player.spigot().sendMessage(accept, decline);
         });

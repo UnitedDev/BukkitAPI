@@ -17,6 +17,7 @@ public class DiscordWebhook {
 
     public static final String LOGO_URL = "https://cdn.discordapp.com/avatars/689755078839500800/72844d9db202352f6dc3908dbc97dff5.png?size=4096";
     public static final String REPORT_CHANNEL = "https://discord.com/api/webhooks/974423064517423114/Bf5ouGaC3D9ixiJfRPluPGgFlAkzUFEdQxS4oW5dln35Q-266zOVcPannjiCH8nFj_13";
+    public static final String PUNISH_CHANNEL = "https://discord.com/api/webhooks/975050846222032997/dqkoEIAih5x_HzzvsjsypsA2vIyICZ01iyqlSDIm8CUgfXVCzo1gZCS2OPZyfqt4TPu5";
 
     private final String url;
     private String content;

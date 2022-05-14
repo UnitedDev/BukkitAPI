@@ -48,13 +48,13 @@ public class HistoryMenu extends PaginatedMenu {
             @Override
             public ItemStack getButtonItem(Player p0) {
                 List<String> lore = new ArrayList<>();
-                lore.add("&7&m» &7Blacklists");
-                lore.add("&7&m» &7Bannissements");
-                lore.add("&7&m» &7Mutes");
+                lore.add("&7&m»&7 Blacklists");
+                lore.add("&7&m»&7 Bannissements");
+                lore.add("&7&m»&7 Mutes");
 
                 if (type == PunishmentData.PunishmentType.BLACKLIST) lore.set(0, "&a&l» &aBlacklists");
-                if (type == PunishmentData.PunishmentType.BAN) lore.set(0, "&a&l» &aBannissements");
-                if (type == PunishmentData.PunishmentType.MUTE) lore.set(0, "&a&l» &aMutes");
+                if (type == PunishmentData.PunishmentType.BAN) lore.set(1, "&a&l» &aBannissements");
+                if (type == PunishmentData.PunishmentType.MUTE) lore.set(2, "&a&l» &aMutes");
 
                 return new ItemBuilder(Heads.SETTINGS.toItemStack()).setName("&cTriage").setLore(lore).toItemStack();
             }
@@ -96,13 +96,14 @@ public class HistoryMenu extends PaginatedMenu {
             List<String> lore = new ArrayList<>();
 
             lore.add("");
-            lore.add("&8❘ &7Auteur: &6" + Bukkit.getOfflinePlayer(punishment.getExecutor()).getName());
+            lore.add("&8❘ &7Auteur: &6" + BukkitAPI.getCommonAPI().getProfile(punishment.getExecutor()).getDisplayName());
             lore.add("&8❘ &7Date: &6" + TimeUtil.formatDate(punishment.getDate().getTime()));
             lore.add("&8❘ &7Expiration: &6" + TimeUtil.formatDate(punishment.getDate().getTime() + punishment.getDuration()));
             lore.add("&8❘ &7Type: &6" + PunishmentMenu.getDisplay(punishment.getPunishmentType()));
+            lore.add("&8❘ &7Raison: &6" + punishment.getReason());
             if(punishment.getEdits().size() != 0) lore.add("&8❘ &7Modifications:");
             for (PunishmentData.PunishmentEdit edit : punishment.getEdits()) {
-                lore.add(" &6" + Bukkit.getOfflinePlayer(edit.getExecutor()).getName() + ":");
+                lore.add(" &6" + BukkitAPI.getCommonAPI().getProfile(edit.getExecutor()).getDisplayName() + ":");
                 lore.add(" &8- &7Raison: &6" + edit.getReason());
                 lore.add(" &8- &6" + TimeUtil.getReallyNiceTime2(edit.getOldDuration()) + " &8» &6" + TimeUtil.getReallyNiceTime2(edit.getNewDuration()));
             }

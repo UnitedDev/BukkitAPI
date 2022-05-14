@@ -6,6 +6,7 @@ import fr.kohei.menu.Button;
 import fr.kohei.menu.GlassMenu;
 import fr.kohei.menu.Menu;
 import fr.kohei.menu.buttons.ConversationButton;
+import fr.kohei.messaging.packet.PunishmentPacket;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.ItemBuilder;
 import fr.kohei.utils.TimeUtil;
@@ -19,13 +20,19 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class EditPunishmentMenu extends GlassMenu {
     private final PunishmentData punishment;
     private final OfflinePlayer target;
     private final Menu oldMenu;
 
-    private long newTime = punishment.getDuration();
+    private long newTime;
+
+    public EditPunishmentMenu(PunishmentData punishment, OfflinePlayer target, Menu oldMenu) {
+        this.punishment = punishment;
+        this.target = target;
+        this.oldMenu = oldMenu;
+        newTime = punishment.getDuration();
+    }
 
     @Override
     public int getGlassColor() {
@@ -36,21 +43,24 @@ public class EditPunishmentMenu extends GlassMenu {
     public Map<Integer, Button> getAllButtons(Player player) {
         Map<Integer, Button> buttons = new HashMap<>();
 
-        buttons.put(10, new RemoveTimeButton(TimeUtil.getDuration("1d"), 1));
-        buttons.put(11, new RemoveTimeButton(TimeUtil.getDuration("1h"), 14));
-        buttons.put(12, new RemoveTimeButton(TimeUtil.getDuration("30m"), 11));
+        buttons.put(10, new RemoveTimeButton(TimeUtil.getDuration("7d"), 1));
+        buttons.put(11, new RemoveTimeButton(TimeUtil.getDuration("1d"), 14));
+        buttons.put(12, new RemoveTimeButton(TimeUtil.getDuration("1h"), 11));
         buttons.put(13, new PermButton());
-        buttons.put(14, new AddTimeButton(TimeUtil.getDuration("30m"), 11));
-        buttons.put(15, new AddTimeButton(TimeUtil.getDuration("1h"), 10));
-        buttons.put(16, new AddTimeButton(TimeUtil.getDuration("1d"), 2));
+        buttons.put(4, new UnbanButton());
+        buttons.put(14, new AddTimeButton(TimeUtil.getDuration("1h"), 11));
+        buttons.put(15, new AddTimeButton(TimeUtil.getDuration("1d"), 10));
+        buttons.put(16, new AddTimeButton(TimeUtil.getDuration("7d"), 2));
 
         buttons.put(22, new ConversationButton<>(
                 new ItemBuilder(Material.SLIME_BALL).setName("&a&lConfirmer").toItemStack(),
                 player, ChatUtil.prefix("&aMerci de rentrer la raison de cette modification"),
                 (name, pair) -> {
                     punishment.getEdits().add(new PunishmentData.PunishmentEdit(punishment.getDuration(), newTime, pair.getRight(), player.getUniqueId()));
+                    punishment.setDuration(newTime);
                     BukkitAPI.getCommonAPI().updatePunishment(punishment);
-                    new HistoryMenu(target, null);
+                    BukkitAPI.getCommonAPI().getMessaging().sendPacket(new PunishmentPacket(punishment, null, false));
+                    new HistoryMenu(target, null).openMenu(player);
                 }
         ));
 
@@ -121,6 +131,28 @@ public class EditPunishmentMenu extends GlassMenu {
         @Override
         public void clicked(Player player, int slot, ClickType clickType, int hotbarButton) {
             newTime += duration;
+        }
+
+        @Override
+        public boolean shouldUpdate(Player player, int slot, ClickType clickType) {
+            return true;
+        }
+    }
+
+    private class UnbanButton extends Button {
+        @Override
+        public ItemStack getButtonItem(Player p0) {
+            return new ItemBuilder(Material.COMPASS).setName("&cUnban").setLore(
+                    "&fPermet de révoquer le banissement du",
+                    "&fjoueur",
+                    "",
+                    "&f&l» &cCliquez-ici pour confirmer"
+            ).toItemStack();
+        }
+
+        @Override
+        public void clicked(Player player, int slot, ClickType clickType, int hotbarButton) {
+            newTime = 1000;
         }
 
         @Override

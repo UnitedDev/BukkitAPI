@@ -2,14 +2,15 @@ package fr.kohei.command;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import fr.kohei.common.cache.ProfileData;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.param.Param;
 import fr.kohei.command.param.ParameterData;
 import fr.kohei.command.param.ParameterType;
 import fr.kohei.command.param.defaults.*;
+import fr.kohei.common.cache.ProfileData;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.Reflection;
+import jdk.nashorn.internal.ir.BaseNode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -29,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -242,8 +244,6 @@ public class CommandHandler implements Listener {
         Preconditions.checkState(!initiated);
         initiated = true;
 
-        System.out.println("BIG TEST: " + parameterTypes);
-
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
         registerParameterType(boolean.class, new BooleanParameterType());
@@ -373,6 +373,8 @@ public class CommandHandler implements Listener {
         getCommandMap().register("", new SimpleCommand("exp"));
         getCommandMap().register("", new SimpleCommand("rank"));
         getCommandMap().register("", new SimpleCommand("maintenance"));
+        getCommandMap().register("", new SimpleCommand("grant"));
+        getCommandMap().register("", new SimpleCommand("rank"));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -392,7 +394,7 @@ public class CommandHandler implements Listener {
         }
 
         TextComponent text = new TextComponent("§c⚠ ");
-        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName()))}));
+        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName()))}));
         text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + player.getName() + " message:" + message));
         String finalMessage = message;
 
@@ -403,4 +405,25 @@ public class CommandHandler implements Listener {
         event.setCancelled(true);
     }
 
+    @EventHandler
+    public void onLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+
+        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
+        profile.setDisplayName(player.getDisplayName());
+        BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+
+        if(profile.getRank().permissionPower() >= 1000) {
+            player.setOp(true);
+        }
+
+        if (BukkitAPI.getPunishmentManager().getBan(player.getUniqueId()) != null) {
+            event.setKickMessage(BukkitAPI.getPunishmentManager().getKickMessage(BukkitAPI.getPunishmentManager().getBan(player.getUniqueId())));
+            event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
+        }
+        if (BukkitAPI.getPunishmentManager().getBlacklist(player.getUniqueId()) != null) {
+            event.setKickMessage(BukkitAPI.getPunishmentManager().getKickMessage(BukkitAPI.getPunishmentManager().getBlacklist(player.getUniqueId())));
+            event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
+        }
+    }
 }

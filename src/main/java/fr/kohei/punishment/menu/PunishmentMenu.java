@@ -45,6 +45,11 @@ public class PunishmentMenu extends PaginatedMenu {
         return buttons;
     }
 
+    @Override
+    public Menu backButton() {
+        return oldMenu;
+    }
+
     @RequiredArgsConstructor
     private class PunishButton extends Button {
         private final Punishments punishments;
@@ -105,6 +110,6 @@ public class PunishmentMenu extends PaginatedMenu {
     }
 
     public static String getDisplay(PunishmentData.PunishmentType cat) {
-        return cat.name().substring(0, 1).toLowerCase() + cat.name().substring(1);
+        return cat.name().substring(0, 1).toUpperCase(Locale.ROOT) + cat.name().substring(1).toLowerCase();
     }
 }

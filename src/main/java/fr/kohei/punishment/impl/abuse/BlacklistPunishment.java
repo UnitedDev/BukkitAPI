@@ -1,5 +1,6 @@
 package fr.kohei.punishment.impl.abuse;
 
+import fr.kohei.common.cache.PunishmentData;
 import fr.kohei.punishment.AbstractPunishment;
 import fr.kohei.punishment.Punishments;
 
@@ -10,7 +11,7 @@ public class BlacklistPunishment extends AbstractPunishment {
 
     public BlacklistPunishment() {
         super(Punishments.BLACKLIST);
-        this.punishmentAdapters.add(new PunishmentAdapter(-1, PunishmentType.BLACKLIST, 1));
+        this.punishmentAdapters.add(new PunishmentAdapter(-1, PunishmentData.PunishmentType.BLACKLIST, 1));
     }
 
 }

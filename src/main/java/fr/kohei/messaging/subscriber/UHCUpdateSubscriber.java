@@ -1,9 +1,9 @@
-package fr.kohei.messaging.list.subscriber;
+package fr.kohei.messaging.subscriber;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.messaging.list.packet.UHCUpdatePacket;
-import fr.kohei.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.messaging.pigdin.PacketListener;
+import fr.kohei.messaging.packet.UHCUpdatePacket;
+import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.messaging.pigdin.PacketListener;
 
 public class UHCUpdateSubscriber implements PacketListener {
 
