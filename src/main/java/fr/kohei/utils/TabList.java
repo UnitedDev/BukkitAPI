@@ -1,5 +1,6 @@
 package fr.kohei.utils;
 
+import fr.kohei.common.RedisProvider;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
@@ -13,7 +14,7 @@ public class TabList {
 
     public static void send(Player player, String header, String footer) {
 
-        CompletableFuture.runAsync(() -> {
+        RedisProvider.redisProvider.getExecutor().execute(() -> {
             CraftPlayer craftplayer = (CraftPlayer) player;
             PlayerConnection connection = craftplayer.getHandle().playerConnection;
             IChatBaseComponent headerJSON = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + header + "\"}");

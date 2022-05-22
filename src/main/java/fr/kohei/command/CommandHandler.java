@@ -8,6 +8,7 @@ import fr.kohei.command.param.ParameterData;
 import fr.kohei.command.param.ParameterType;
 import fr.kohei.command.param.defaults.*;
 import fr.kohei.common.cache.ProfileData;
+import fr.kohei.tasks.TabListTask;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.Reflection;
 import jdk.nashorn.internal.ir.BaseNode;
@@ -317,6 +318,7 @@ public class CommandHandler implements Listener {
     @EventHandler
     public void onKick(PlayerKickEvent event) {
         if(event.getReason().equalsIgnoreCase("disconnect.spam")) event.setCancelled(true);
+        if(event.getReason().contains("Flying is not enabled")) event.setCancelled(true);
     }
 
     public static class SimpleCommand extends org.bukkit.command.Command {
@@ -395,7 +397,7 @@ public class CommandHandler implements Listener {
 
         TextComponent text = new TextComponent("§c⚠ ");
         text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName()))}));
-        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + player.getName() + " message:" + message));
+        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + player.getName() + " message:" + message.replace("§b", "").replace("§f", "")));
         String finalMessage = message;
 
         Bukkit.getOnlinePlayers().forEach(player1 -> player1.spigot().sendMessage(text, new TextComponent(
@@ -409,9 +411,13 @@ public class CommandHandler implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
+        TabListTask.sendTabList(player);
+
         ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-        profile.setDisplayName(player.getDisplayName());
-        BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+        if(!profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
+            profile.setDisplayName(player.getDisplayName());
+            BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+        }
 
         if(profile.getRank().permissionPower() >= 1000) {
             player.setOp(true);

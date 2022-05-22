@@ -16,7 +16,6 @@ import org.bukkit.Material;
  * This class is mainly used for the punishment gui.
  *
  * @author Rhodless
- * @see PunishMenu
  */
 @Getter
 @RequiredArgsConstructor
