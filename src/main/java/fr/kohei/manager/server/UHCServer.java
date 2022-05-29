@@ -42,7 +42,9 @@ public class UHCServer {
     @Getter
     @RequiredArgsConstructor
     public enum ServerType {
-        MHA("MHA", Heads.DEKU.toItemStack());
+        MHA("MHA", Heads.DEKU.toItemStack()),
+        MUGIWARA("Mugiwara", Heads.LUFFY.toItemStack())
+        ;
 
         private final String name;
         private final ItemStack display;
