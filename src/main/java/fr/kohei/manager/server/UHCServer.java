@@ -44,6 +44,7 @@ public class UHCServer {
     public enum ServerType {
         MHA("MHA", Heads.DEKU.toItemStack()),
         MUGIWARA("Mugiwara", Heads.LUFFY.toItemStack())
+
         ;
 
         private final String name;
