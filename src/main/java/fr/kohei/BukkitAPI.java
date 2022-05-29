@@ -45,6 +45,13 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     @Getter
     private static PunishmentManager punishmentManager;
 
+    @Getter
+    @Setter
+    private static int normalPlayers;
+    @Getter
+    @Setter
+    private static int totalPlayers;
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -65,7 +72,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         this.registerListeners();
 
         this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 2 * 20);
-        new TabListTask(this).runTaskTimer(this, 0, 100);
+        new TabListTask(this).runTaskTimer(this, 0, 20);
     }
 
     public static ServiceInfoSnapshot getFactory(int port) {
@@ -136,10 +143,5 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         return Division.values()[(division.ordinal() + 1) % Division.values().length];
     }
 
-    @Getter
-    @Setter
-    private static int normalPlayers;
-    @Getter
-    @Setter
-    private static int totalPlayers;
+
 }
