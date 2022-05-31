@@ -1,6 +1,5 @@
 package fr.kohei.manager;
 
-import com.sun.java.browser.net.ProxyService;
 import fr.kohei.BukkitAPI;
 import fr.kohei.common.RedisProvider;
 import fr.kohei.common.cache.ProfileData;

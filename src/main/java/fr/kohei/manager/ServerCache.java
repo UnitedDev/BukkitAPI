@@ -57,6 +57,7 @@ public class ServerCache {
             if (toReturn == null) toReturn = lobbyServer;
             else {
                 if (toReturn.getPlayers() <= lobbyServer.getPlayers()) continue;
+                if (lobbyServer.isRestricted()) continue;
                 toReturn = lobbyServer;
             }
         }
@@ -75,6 +76,7 @@ public class ServerCache {
             if (toReturn == null) toReturn = lobbyServer;
             else {
                 if (toReturn.getPlayers() <= lobbyServer.getPlayers()) continue;
+                if (lobbyServer.isRestricted()) continue;
                 toReturn = lobbyServer;
             }
         }
