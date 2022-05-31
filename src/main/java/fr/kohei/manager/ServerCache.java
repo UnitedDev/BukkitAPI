@@ -47,4 +47,18 @@ public class ServerCache {
         this.lobbyServers.remove(port);
         this.ctfServers.remove(port);
     }
+
+    public LobbyServer findBestLobby() {
+
+        LobbyServer toReturn = null;
+
+        for (LobbyServer lobbyServer : lobbyServers.values()) {
+            if (toReturn == null) toReturn = lobbyServer;
+            else {
+                if (toReturn.getPlayers() <= lobbyServer.getPlayers()) continue;
+                toReturn = lobbyServer;
+            }
+        }
+        return toReturn;
+    }
 }
