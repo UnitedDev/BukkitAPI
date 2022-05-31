@@ -56,6 +56,12 @@ public class PlayerCommands {
         }
     }
 
+    @Command(names = "hub")
+    public static void hub(Player sender) {
+        if (BukkitAPI.getServerCache().findBestLobbyFor(sender.getUniqueId()) == null) BukkitAPI.sendToServer(sender, "Limbo");
+        else BukkitAPI.sendToServer(sender, BukkitAPI.getFactory(BukkitAPI.getServerCache().findBestLobbyFor(sender.getUniqueId()).getPort()).getName());
+    }
+
     public static int getPing(Player player) {
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         return entityPlayer.ping;
