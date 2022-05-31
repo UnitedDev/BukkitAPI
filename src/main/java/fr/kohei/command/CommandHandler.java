@@ -11,7 +11,6 @@ import fr.kohei.common.cache.ProfileData;
 import fr.kohei.tasks.TabListTask;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.Reflection;
-import jdk.nashorn.internal.ir.BaseNode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -378,7 +377,6 @@ public class CommandHandler implements Listener {
         getCommandMap().register("", new SimpleCommand("rank"));
         getCommandMap().register("", new SimpleCommand("maintenance"));
         getCommandMap().register("", new SimpleCommand("grant"));
-        getCommandMap().register("", new SimpleCommand("rank"));
     }
 
     @EventHandler(ignoreCancelled = true)
