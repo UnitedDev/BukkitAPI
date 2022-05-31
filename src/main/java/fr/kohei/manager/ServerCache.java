@@ -1,5 +1,6 @@
 package fr.kohei.manager;
 
+import fr.kohei.BukkitAPI;
 import fr.kohei.manager.server.CTFServer;
 import fr.kohei.manager.server.LobbyServer;
 import fr.kohei.manager.server.UHCServer;
@@ -52,6 +53,24 @@ public class ServerCache {
 
         LobbyServer toReturn = null;
 
+        for (LobbyServer lobbyServer : lobbyServers.values()) {
+            if (toReturn == null) toReturn = lobbyServer;
+            else {
+                if (toReturn.getPlayers() <= lobbyServer.getPlayers()) continue;
+                toReturn = lobbyServer;
+            }
+        }
+        return toReturn;
+    }
+
+    public LobbyServer findBestLobbyFor(UUID uuid) {
+
+        LobbyServer toReturn = null;
+
+        if (BukkitAPI.getCommonAPI().getProfile(uuid).getRank().permissionPower() >= 5) {
+            if (lobbyServers.values().stream().anyMatch(LobbyServer::isRestricted))
+            return lobbyServers.values().stream().filter(LobbyServer::isRestricted).findFirst().orElse(null);
+        }
         for (LobbyServer lobbyServer : lobbyServers.values()) {
             if (toReturn == null) toReturn = lobbyServer;
             else {
