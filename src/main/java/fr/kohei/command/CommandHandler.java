@@ -24,14 +24,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.command.defaults.TimingsCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -355,6 +353,10 @@ public class CommandHandler implements Listener {
         commands.keySet().forEach(s -> {
             org.bukkit.command.Command command = commands.get(s);
             if(command.getName().equalsIgnoreCase("mumble")) return;
+            if(command.getName().equalsIgnoreCase("imanityspigot")) return;
+            if(command.getName().equalsIgnoreCase("imanity")) return;
+            if(command.getName().equalsIgnoreCase("ispigot")) return;
+            if(command.getName().equalsIgnoreCase("timings")) return;
             command.unregister(getCommandMap());
             commands.remove(s);
         });
@@ -408,16 +410,23 @@ public class CommandHandler implements Listener {
     }
 
     @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
-        TabListTask.sendTabList(player);
 
         ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
         if(!profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
             profile.setDisplayName(player.getDisplayName());
             BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
         }
+    }
+
+    @EventHandler
+    public void onLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+
+        TabListTask.sendTabList(player);
+
+        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
 
         if(profile.getRank().permissionPower() >= 1000) {
             player.setOp(true);
