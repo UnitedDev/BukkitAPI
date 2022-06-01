@@ -60,12 +60,18 @@ public class PlayerCommands {
         }
     }
 
-    @Command(names = "hub")
+    @Command(names = {"hub", "leave", "lobby"})
     public static void hub(Player sender) {
         if (BukkitAPI.getCommonAPI().getServerCache().findBestLobbyFor(sender.getUniqueId()) == null)
             BukkitAPI.sendToServer(sender, "Limbo");
-        else
+        else {
+            if (BukkitAPI.getFactory(Bukkit.getPort()).getName().contains("Lobby")) {
+                sender.sendMessage(ChatUtil.prefix("&cVous êtes déjà connecté sur un lobby."));
+                return;
+            }
             BukkitAPI.sendToServer(sender, BukkitAPI.getFactory(BukkitAPI.getCommonAPI().getServerCache().findBestLobbyFor(sender.getUniqueId()).getPort()).getName());
+        }
+
     }
 
     public static int getPing(Player player) {
@@ -79,26 +85,26 @@ public class PlayerCommands {
         for (double tps : MinecraftServer.getServer().recentTps)
         {
             sb.append(format(tps));
-            sb.append( ", " );
+            sb.append(", ");
         }
 
         long serverTime = ManagementFactory.getRuntimeMXBean().getStartTime();
         String uptime = DurationFormatUtils.formatDurationWords(System.currentTimeMillis() - serverTime, true, true);
 
-        String tps = sb.substring( 0, sb.length() - 2 );
+        String tps = sb.substring(0, sb.length() - 2);
 
         sender.sendMessage(" ");
         sender.sendMessage(ChatUtil.translate("&6&lServer Info&7:"));
-        sender.sendMessage(ChatUtil.translate(" &7* &eTPS&7: &6" + tps));
-        sender.sendMessage(ChatUtil.translate(" &7* &eUptime&7: &6" + uptime));
-        sender.sendMessage(ChatUtil.translate(" &7* &eMemoire Max&7: &6" + Runtime.getRuntime().maxMemory() / 1024 / 1024 + " &eMB"));
-        sender.sendMessage(ChatUtil.translate(" &7* &eMemoire Alloué&7: &6" + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " &eMB"));
-        sender.sendMessage(ChatUtil.translate(" &7* &eMemoire Libre&7: &6" + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " &eMB"));
+        sender.sendMessage(ChatUtil.translate(" &7» &eTPS&7: &6" + tps));
+        sender.sendMessage(ChatUtil.translate(" &7» &eUptime&7: &6" + uptime));
+        sender.sendMessage(ChatUtil.translate(" &7» &eMemoire Max&7: &6" + Runtime.getRuntime().maxMemory() / 1024 / 1024 + " &eMB"));
+        sender.sendMessage(ChatUtil.translate(" &7» &eMemoire Alloué&7: &6" + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " &eMB"));
+        sender.sendMessage(ChatUtil.translate(" &7» &eMemoire Libre&7: &6" + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " &eMB"));
         sender.sendMessage("");
         sender.sendMessage(ChatUtil.translate("&e&lMondes&7:"));
 
-        for(World world : Bukkit.getWorlds()) {
-            sender.sendMessage(ChatUtil.translate(" &7* &6" + world.getName() + "&7: &eChunks Load&7: &6" + world.getLoadedChunks().length + "&7, &eEntités&7: &6" + world.getEntities().size()));
+        for (World world : Bukkit.getWorlds()) {
+            sender.sendMessage(ChatUtil.translate(" &7» &6" + world.getName() + "&7: &eChunks Load&7: &6" + world.getLoadedChunks().length + "&7, &eEntités&7: &6" + world.getEntities().size()));
         }
         sender.sendMessage(" ");
     }
