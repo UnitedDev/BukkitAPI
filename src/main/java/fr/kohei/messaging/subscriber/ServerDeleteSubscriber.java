@@ -9,7 +9,7 @@ public class ServerDeleteSubscriber implements PacketListener {
 
     @IncomingPacketHandler
     public void onReceive(ServerDeletePacket packet) {
-        BukkitAPI.getServerCache().attemptDeletePort(packet.getPort());
+        BukkitAPI.getCommonAPI().getServerCache().attemptDeletePort(packet.getPort());
     }
 
 }

@@ -242,7 +242,7 @@ public class ModCommands {
     public static void staffList(Player player) {
         player.sendMessage(" ");
         player.sendMessage(ChatUtil.translate("&8» &c&lStaff List"));
-        BukkitAPI.getServerCache().getPlayers().forEach((uuid, s) -> {
+        BukkitAPI.getCommonAPI().getServerCache().getPlayers().forEach((uuid, s) -> {
             ProfileData data = BukkitAPI.getCommonAPI().getProfile(uuid);
             String executorDisplay = data.getRank().getTabPrefix() + " " + data.getDisplayName();
             player.sendMessage(ChatUtil.translate(" &7■ " + executorDisplay));

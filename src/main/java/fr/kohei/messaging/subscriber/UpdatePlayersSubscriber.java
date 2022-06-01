@@ -9,7 +9,7 @@ public class UpdatePlayersSubscriber implements PacketListener {
 
     @IncomingPacketHandler
     public void onReceive(UpdatePlayersPacket packet) {
-        BukkitAPI.getServerCache().setPlayers(packet.getPlayers());
+        BukkitAPI.getCommonAPI().getServerCache().setPlayers(packet.getPlayers());
     }
 
 }

@@ -4,7 +4,7 @@ import fr.kohei.BukkitAPI;
 import fr.kohei.common.RedisProvider;
 import fr.kohei.common.cache.ProfileData;
 import fr.kohei.common.cache.PunishmentData;
-import fr.kohei.manager.server.UHCServer;
+import fr.kohei.common.cache.server.UHCServer;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
 import fr.kohei.messaging.packet.PunishmentPacket;
 import fr.kohei.punishment.menu.PunishmentAskMenu;
@@ -16,7 +16,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -58,7 +57,7 @@ public class PunishmentManager {
 
         if (profile.getRank().getPermissionPower() < 40 && punishment.getPunishmentType() != PunishmentData.PunishmentType.MUTE) {
             boolean online = false;
-            for (UUID uuid : BukkitAPI.getServerCache().getPlayers().keySet()) {
+            for (UUID uuid : BukkitAPI.getCommonAPI().getServerCache().getPlayers().keySet()) {
                 ProfileData uProfile = BukkitAPI.getCommonAPI().getProfile(uuid);
 
                 if (uProfile.getRank().permissionPower() >= 40) {
@@ -90,7 +89,7 @@ public class PunishmentManager {
 
         int found = -1;
 
-        for (Map.Entry<Integer, UHCServer> entry : BukkitAPI.getServerCache().getUhcServers().entrySet()) {
+        for (Map.Entry<Integer, UHCServer> entry : BukkitAPI.getCommonAPI().getServerCache().getUhcServers().entrySet()) {
             Integer integer = entry.getKey();
             UHCServer uhcServer = entry.getValue();
             if (uhcServer.getStatus() == UHCServer.ServerStatus.PLAYING && uhcServer.getUuids().contains(punishment.getPunished())) {
