@@ -6,7 +6,7 @@
 
     <groupId>fr.kohei</groupId>
     <artifactId>bukkitapi</artifactId>
-    <version>1.1.6</version>
+    <version>1.1.8</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>fr.kohei</groupId>
             <artifactId>common</artifactId>
-            <version>1.4.1</version>
+            <version>1.4.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

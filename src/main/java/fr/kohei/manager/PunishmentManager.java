@@ -4,7 +4,7 @@ import fr.kohei.BukkitAPI;
 import fr.kohei.common.RedisProvider;
 import fr.kohei.common.cache.ProfileData;
 import fr.kohei.common.cache.PunishmentData;
-import fr.kohei.common.cache.server.UHCServer;
+import fr.kohei.common.cache.server.impl.UHCServer;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
 import fr.kohei.messaging.packet.PunishmentPacket;
 import fr.kohei.punishment.menu.PunishmentAskMenu;

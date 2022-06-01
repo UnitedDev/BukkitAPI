@@ -11,6 +11,8 @@ import fr.kohei.command.impl.PlayerCommands;
 import fr.kohei.common.api.CommonAPI;
 import fr.kohei.common.cache.Division;
 import fr.kohei.common.cache.ProfileData;
+import fr.kohei.common.cache.server.IServer;
+import fr.kohei.common.cache.server.impl.CTFServer;
 import fr.kohei.manager.ChatReportManager;
 import fr.kohei.manager.PunishmentManager;
 import fr.kohei.menu.MenuAPI;
@@ -67,6 +69,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         this.registerListeners();
 
         this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 2 * 20);
+
 //        new TabListTask(this).runTaskTimer(this, 0, 20);
     }
 
