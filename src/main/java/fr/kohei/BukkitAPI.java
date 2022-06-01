@@ -13,11 +13,9 @@ import fr.kohei.common.cache.Division;
 import fr.kohei.common.cache.ProfileData;
 import fr.kohei.manager.ChatReportManager;
 import fr.kohei.manager.PunishmentManager;
-import fr.kohei.manager.ServerCache;
 import fr.kohei.menu.MenuAPI;
 import fr.kohei.messaging.packet.*;
 import fr.kohei.messaging.subscriber.*;
-import fr.kohei.tasks.TabListTask;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.item.CustomItemListener;
 import lombok.Getter;
@@ -36,8 +34,6 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     private static MenuAPI menuAPI;
     @Getter
     private static CommandHandler commandHandler;
-    @Getter
-    private static ServerCache serverCache;
     @Getter
     private static CommonAPI commonAPI;
     @Getter
@@ -62,7 +58,6 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         commonAPI = CommonAPI.create();
         menuAPI = new MenuAPI(plugin);
         commandHandler = new CommandHandler(plugin);
-        serverCache = new ServerCache(plugin);
         chatReportManager = new ChatReportManager();
         punishmentManager = new PunishmentManager();
 
@@ -72,7 +67,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         this.registerListeners();
 
         this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 2 * 20);
-        new TabListTask(this).runTaskTimer(this, 0, 20);
+//        new TabListTask(this).runTaskTimer(this, 0, 20);
     }
 
     public static ServiceInfoSnapshot getFactory(int port) {
@@ -91,11 +86,8 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     }
 
     private void loadRedis() {
-        commonAPI.getMessaging().registerAdapter(LobbyUpdatePacket.class, new LobbyUpdateSubscriber());
-        commonAPI.getMessaging().registerAdapter(UHCUpdatePacket.class, new UHCUpdateSubscriber());
         commonAPI.getMessaging().registerAdapter(CountUpdatePacket.class, new CountUpdateSubscriber());
         commonAPI.getMessaging().registerAdapter(ServerDeletePacket.class, new ServerDeleteSubscriber());
-        commonAPI.getMessaging().registerAdapter(CTFUpdatePacket.class, new CTFUpdateSubscriber());
         commonAPI.getMessaging().registerAdapter(PunishmentAskPacket.class, new PunishmentAskSubscriber());
         commonAPI.getMessaging().registerAdapter(PunishmentPacket.class, new PunishmentSubscriber());
         commonAPI.getMessaging().registerAdapter(UpdatePlayersPacket.class, new UpdatePlayersSubscriber());
@@ -142,6 +134,4 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     public static Division nextDivision(Division division) {
         return Division.values()[(division.ordinal() + 1) % Division.values().length];
     }
-
-
 }
