@@ -12,6 +12,7 @@ import fr.kohei.punishment.menu.HistoryMenu;
 import fr.kohei.punishment.menu.PunishmentCategoryMenu;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.TimeUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -167,6 +168,10 @@ public class ModCommands {
         sender.sendMessage(ChatUtil.prefix("&fVous avez débanni " + executorDisplay));
     }
 
+    @Command(names = "stop", power = 50)
+    public static void stop(Player player) {
+        Bukkit.getServer().shutdown();
+    }
 
     @Command(names = "mute", power = 39)
     public static void mute(Player sender, @Param(name = "player") OfflinePlayer target, @Param(name = "raison", wildcard = true) String reason) {
