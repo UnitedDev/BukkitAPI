@@ -3,7 +3,6 @@ package fr.kohei.command.impl;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.Command;
 import fr.kohei.command.param.Param;
-import fr.kohei.common.RedisProvider;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.DiscordWebhook;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -26,6 +25,11 @@ public class PlayerCommands {
 
         name = name.replaceFirst("name:", "");
         message = message.replaceFirst("message:", "");
+
+        if (name.equalsIgnoreCase(sender.getName())) {
+            sender.sendMessage(ChatUtil.prefix("&cVous êtes devenu fou ?"));
+            return;
+        }
 
         if (BukkitAPI.getChatReportManager().getCooldown().getOrDefault(sender.getUniqueId(), false)) {
             sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 120 secondes avant de report un autre message."));
@@ -58,8 +62,10 @@ public class PlayerCommands {
 
     @Command(names = "hub")
     public static void hub(Player sender) {
-        if (BukkitAPI.getServerCache().findBestLobbyFor(sender.getUniqueId()) == null) BukkitAPI.sendToServer(sender, "Limbo");
-        else BukkitAPI.sendToServer(sender, BukkitAPI.getFactory(BukkitAPI.getServerCache().findBestLobbyFor(sender.getUniqueId()).getPort()).getName());
+        if (BukkitAPI.getCommonAPI().getServerCache().findBestLobbyFor(sender.getUniqueId()) == null)
+            BukkitAPI.sendToServer(sender, "Limbo");
+        else
+            BukkitAPI.sendToServer(sender, BukkitAPI.getFactory(BukkitAPI.getCommonAPI().getServerCache().findBestLobbyFor(sender.getUniqueId()).getPort()).getName());
     }
 
     public static int getPing(Player player) {

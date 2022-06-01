@@ -23,7 +23,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.command.defaults.TimingsCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -412,7 +411,7 @@ public class CommandHandler implements Listener {
         Player player = event.getPlayer();
 
         ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-        if(!profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
+        if (profile.getDisplayName() == null || !profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
             profile.setDisplayName(player.getDisplayName());
             BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
         }
