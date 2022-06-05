@@ -350,11 +350,18 @@ public class CommandHandler implements Listener {
 
         commands.keySet().forEach(s -> {
             org.bukkit.command.Command command = commands.get(s);
-            if(command.getName().equalsIgnoreCase("mumble")) return;
-            if(command.getName().equalsIgnoreCase("imanityspigot")) return;
-            if(command.getName().equalsIgnoreCase("imanity")) return;
-            if(command.getName().equalsIgnoreCase("ispigot")) return;
-            if(command.getName().equalsIgnoreCase("timings")) return;
+            if (command.getName().equalsIgnoreCase("mumble")) return;
+            if (command.getName().equalsIgnoreCase("imanityspigot")) return;
+            if (command.getName().equalsIgnoreCase("imanity")) return;
+            if (command.getName().equalsIgnoreCase("ispigot")) return;
+            if (command.getName().equalsIgnoreCase("timings")) return;
+            if (command.getName().equalsIgnoreCase("joinqueue")) return;
+            if (command.getName().equalsIgnoreCase("datadump")) return;
+            if (command.getName().equalsIgnoreCase("forcesend")) return;
+            if (command.getName().equalsIgnoreCase("joinqueue")) return;
+            if (command.getName().equalsIgnoreCase("leavequeue")) return;
+            if (command.getName().equalsIgnoreCase("queueclear")) return;
+            if (command.getName().equalsIgnoreCase("queuetoggle")) return;
             command.unregister(getCommandMap());
             commands.remove(s);
         });
@@ -388,7 +395,7 @@ public class CommandHandler implements Listener {
             if(message.contains(onlinePlayer.getName())) {
                 ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(onlinePlayer.getUniqueId());
                 if(targetProfile.isNotifications()) {
-                    onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.LEVEL_UP, 0.5f, 0.5f);
+                    onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ORB_PICKUP, 1f, 1f);
                 }
                 message = message.replace(onlinePlayer.getName(), "§b@" + onlinePlayer.getName() + "§f");
             }
