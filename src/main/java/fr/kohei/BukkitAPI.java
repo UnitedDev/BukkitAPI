@@ -69,8 +69,6 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         this.registerListeners();
 
         this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 2 * 20);
-
-//        new TabListTask(this).runTaskTimer(this, 0, 20);
     }
 
     public static ServiceInfoSnapshot getFactory(int port) {
