@@ -11,8 +11,6 @@ import fr.kohei.command.impl.PlayerCommands;
 import fr.kohei.common.api.CommonAPI;
 import fr.kohei.common.cache.Division;
 import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.server.IServer;
-import fr.kohei.common.cache.server.impl.CTFServer;
 import fr.kohei.manager.ChatReportManager;
 import fr.kohei.manager.PunishmentManager;
 import fr.kohei.menu.MenuAPI;
@@ -92,6 +90,8 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         commonAPI.getMessaging().registerAdapter(PunishmentAskPacket.class, new PunishmentAskSubscriber());
         commonAPI.getMessaging().registerAdapter(PunishmentPacket.class, new PunishmentSubscriber());
         commonAPI.getMessaging().registerAdapter(UpdatePlayersPacket.class, new UpdatePlayersSubscriber());
+        commonAPI.getMessaging().registerAdapter(AttemptLinkPacket.class, new AttemptLinkSubscriber());
+        commonAPI.getMessaging().registerAdapter(LinkSuccessPacket.class, null);
     }
 
     public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {

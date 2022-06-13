@@ -4,6 +4,7 @@ import fr.kohei.BukkitAPI;
 import fr.kohei.common.RedisProvider;
 import fr.kohei.common.cache.ProfileData;
 import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.common.cache.Report;
 import fr.kohei.common.cache.server.impl.UHCServer;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
 import fr.kohei.messaging.packet.PunishmentPacket;
@@ -19,8 +20,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 public class PunishmentManager {
@@ -139,6 +142,23 @@ public class PunishmentManager {
 
         webhook.addEmbed(object);
         webhook.execute();
+
+        ProfileData target = BukkitAPI.getCommonAPI().getProfile(data.getPunished());
+        List<Report> validReports = BukkitAPI.getCommonAPI().getReports().stream()
+                .filter(report -> !report.isResolved() && report.getUuid().equals(data.getPunished()))
+                .collect(Collectors.toList());
+
+        if(validReports.isEmpty()) return;
+
+        Bukkit.getPlayer(data.getExecutor()).sendMessage(ChatUtil.prefix("&fIl semblerait que &c" + target.getDisplayName()
+                + "&f ait des reports en attente de résolution."));
+        TextComponent textComponent = new TextComponent("§a§l[RÉSOLUTION DES REPORTS]");
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
+                new TextComponent(ChatUtil.translate("&c⚠ Cliquez-ici pour accéder à la liste des reports en attente de " + target.getDisplayName()))
+        }));
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/reports " + target.getDisplayName()));
+        Bukkit.getPlayer(data.getExecutor()).spigot().sendMessage(textComponent);
     }
 
     public String getKickMessage(PunishmentData punishment) {

@@ -1,6 +1,7 @@
 package fr.kohei.punishment.menu;
 
 import fr.kohei.BukkitAPI;
+import fr.kohei.common.cache.ProfileData;
 import fr.kohei.common.cache.PunishmentData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.GlassMenu;
@@ -12,7 +13,6 @@ import fr.kohei.utils.ItemBuilder;
 import fr.kohei.utils.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -22,12 +22,12 @@ import java.util.Map;
 
 public class EditPunishmentMenu extends GlassMenu {
     private final PunishmentData punishment;
-    private final OfflinePlayer target;
+    private final ProfileData target;
     private final Menu oldMenu;
 
     private long newTime;
 
-    public EditPunishmentMenu(PunishmentData punishment, OfflinePlayer target, Menu oldMenu) {
+    public EditPunishmentMenu(PunishmentData punishment, ProfileData target, Menu oldMenu) {
         this.punishment = punishment;
         this.target = target;
         this.oldMenu = oldMenu;

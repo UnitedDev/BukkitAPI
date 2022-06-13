@@ -8,7 +8,6 @@ import fr.kohei.command.param.ParameterData;
 import fr.kohei.command.param.ParameterType;
 import fr.kohei.command.param.defaults.*;
 import fr.kohei.common.cache.ProfileData;
-import fr.kohei.tasks.TabListTask;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.Reflection;
 import lombok.Getter;
@@ -36,10 +35,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandHandler implements Listener {
@@ -313,8 +309,8 @@ public class CommandHandler implements Listener {
 
     @EventHandler
     public void onKick(PlayerKickEvent event) {
-        if(event.getReason().equalsIgnoreCase("disconnect.spam")) event.setCancelled(true);
-        if(event.getReason().contains("Flying is not enabled")) event.setCancelled(true);
+        if (event.getReason().equalsIgnoreCase("disconnect.spam")) event.setCancelled(true);
+        if (event.getReason().contains("Flying is not enabled")) event.setCancelled(true);
     }
 
     public static class SimpleCommand extends org.bukkit.command.Command {
@@ -370,7 +366,7 @@ public class CommandHandler implements Listener {
         BukkitAPI.getCommandHandler().hook();
 
         CommandHandler.getCommands().forEach(commandData ->
-            getCommandMap().register("", new SimpleCommand(commandData.getName().split(" ")[0]))
+                getCommandMap().register("", new SimpleCommand(commandData.getName().split(" ")[0]))
         );
         getCommandMap().register("", new SimpleCommand("ignore"));
         getCommandMap().register("", new SimpleCommand("msg"));
@@ -392,9 +388,9 @@ public class CommandHandler implements Listener {
 
         String message = event.getMessage();
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if(message.contains(onlinePlayer.getName())) {
+            if (message.contains(onlinePlayer.getName())) {
                 ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(onlinePlayer.getUniqueId());
-                if(targetProfile.isNotifications()) {
+                if (targetProfile.isNotifications()) {
                     onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ORB_PICKUP, 1f, 1f);
                 }
                 message = message.replace(onlinePlayer.getName(), "§b@" + onlinePlayer.getName() + "§f");
@@ -402,8 +398,8 @@ public class CommandHandler implements Listener {
         }
 
         TextComponent text = new TextComponent("§c⚠ ");
-        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName()))}));
-        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + player.getName() + " message:" + message.replace("§b", "").replace("§f", "")));
+        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName() + " &c(action effectuée au clic)"))}));
+        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport confirm;name:" + player.getName() + " message:" + message.replace("§b", "").replace("§f", "")));
         String finalMessage = message;
 
         Bukkit.getOnlinePlayers().forEach(player1 -> player1.spigot().sendMessage(text, new TextComponent(
@@ -418,21 +414,39 @@ public class CommandHandler implements Listener {
         Player player = event.getPlayer();
 
         ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-        if (profile.getDisplayName() == null || !profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
+        if (profile.getDisplayName().equals("") || !profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
             profile.setDisplayName(player.getDisplayName());
             BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
         }
+
+        if (profile.getRank().permissionPower() >= 10) {
+            profile.setHosts(-1);
+            if(profile.getIps().contains(player.getAddress().getHostName())) {
+                profile.getIps().add(player.getAddress().getHostName());
+                BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+            }
+        }
+
+        profile.setLastLogin(new Date());
+        BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
+        profile.setPlayTime(profile.getPlayTime() - (profile.getLastLogin().getTime() - System.currentTimeMillis()));
+        BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
     }
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        TabListTask.sendTabList(player);
-
         ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
 
-        if(profile.getRank().permissionPower() >= 1000) {
+        if (profile.getRank().permissionPower() >= 1000) {
             player.setOp(true);
         }
 
