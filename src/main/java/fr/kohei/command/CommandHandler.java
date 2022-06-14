@@ -7,7 +7,7 @@ import fr.kohei.command.param.Param;
 import fr.kohei.command.param.ParameterData;
 import fr.kohei.command.param.ParameterType;
 import fr.kohei.command.param.defaults.*;
-import fr.kohei.common.cache.ProfileData;
+import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.Reflection;
 import lombok.Getter;

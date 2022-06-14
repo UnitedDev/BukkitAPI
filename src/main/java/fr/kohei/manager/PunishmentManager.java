@@ -1,11 +1,11 @@
 package fr.kohei.manager;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.RedisProvider;
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.PunishmentData;
-import fr.kohei.common.cache.Report;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
+import fr.kohei.common.cache.data.Report;
 import fr.kohei.common.cache.server.impl.UHCServer;
+import fr.kohei.common.utils.gson.GsonProvider;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
 import fr.kohei.messaging.packet.PunishmentPacket;
 import fr.kohei.punishment.menu.PunishmentAskMenu;
@@ -77,7 +77,7 @@ public class PunishmentManager {
                         new TextComponent(ChatUtil.translate("&c⚠ Action effectuée au clic"))
                 }));
                 UUID uuid = UUID.randomUUID();
-                BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(uuid, RedisProvider.redisProvider.GSON.toJson(punishment));
+                BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(uuid, GsonProvider.GSON.toJson(punishment));
                 text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                         "/forceban " + uuid
                 ));
@@ -109,7 +109,7 @@ public class PunishmentManager {
                     new TextComponent(ChatUtil.translate("&c⚠ Action effectuée au clic"))
             }));
             UUID uuid = UUID.randomUUID();
-            BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(uuid, RedisProvider.redisProvider.GSON.toJson(punishment));
+            BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(uuid, GsonProvider.GSON.toJson(punishment));
             text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                     "/forceban " + uuid
             ));

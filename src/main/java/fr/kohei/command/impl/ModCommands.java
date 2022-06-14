@@ -3,9 +3,10 @@ package fr.kohei.command.impl;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.Command;
 import fr.kohei.command.param.Param;
-import fr.kohei.common.RedisProvider;
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.common.CommonProvider;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
+import fr.kohei.common.utils.gson.GsonProvider;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
 import fr.kohei.messaging.packet.PunishmentPacket;
 import fr.kohei.punishment.menu.HistoryMenu;
@@ -51,7 +52,7 @@ public class ModCommands {
     public static void forceBan(Player player, @Param(name = "data", wildcard = true) String data) {
         UUID uuid = UUID.fromString(data);
         String str = BukkitAPI.getPunishmentManager().getGsonAskPunishment().get(uuid);
-        PunishmentData punishmentData = RedisProvider.redisProvider.GSON.fromJson(str, PunishmentData.class);
+        PunishmentData punishmentData = GsonProvider.GSON.fromJson(str, PunishmentData.class);
 
         BukkitAPI.getPunishmentManager().punish(punishmentData, null);
     }
@@ -72,7 +73,7 @@ public class ModCommands {
     @Command(names = "declineban", power = 40)
     public static void decline(Player player, @Param(name = "data") String data) {
         UUID uuid = UUID.fromString(data);
-        PunishmentAskPacket packet = RedisProvider.redisProvider.GSON.fromJson(
+        PunishmentAskPacket packet = GsonProvider.GSON.fromJson(
                 BukkitAPI.getPunishmentManager().getGsonAskPunishment().get(uuid), PunishmentAskPacket.class
         );
 
@@ -84,7 +85,7 @@ public class ModCommands {
     @Command(names = "acceptban", power = 40)
     public static void acceptBan(Player player, @Param(name = "data") String data) {
         UUID uuid = UUID.fromString(data);
-        PunishmentAskPacket packet = RedisProvider.redisProvider.GSON.fromJson(
+        PunishmentAskPacket packet = GsonProvider.GSON.fromJson(
                 BukkitAPI.getPunishmentManager().getGsonAskPunishment().get(uuid), PunishmentAskPacket.class
         );
 

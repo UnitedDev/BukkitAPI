@@ -1,11 +1,11 @@
 package fr.kohei.messaging.subscriber;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.messaging.packet.PunishmentPacket;
-import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.common.messaging.pigdin.PacketListener;
+import fr.kohei.common.utils.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.utils.messaging.pigdin.PacketListener;
 import fr.kohei.utils.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

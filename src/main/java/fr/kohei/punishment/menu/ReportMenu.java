@@ -60,7 +60,8 @@ public class ReportMenu extends Menu {
         @Override
         public void clicked(Player player, int slot, ClickType clickType, int hotbarButton) {
             new ConfirmationMenu(() -> {
-                fr.kohei.common.cache.Report report = new fr.kohei.common.cache.Report(
+                BukkitAPI.getChatReportManager().setCooldown(player.getUniqueId());
+                fr.kohei.common.cache.data.Report report = new fr.kohei.common.cache.data.Report(
                         new Date(),
                         UUID.randomUUID(),
                         target.getUniqueId(),

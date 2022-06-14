@@ -1,6 +1,6 @@
 package fr.kohei.punishment.menu;
 
-import fr.kohei.common.cache.ProfileData;
+import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.Menu;
 import fr.kohei.menu.pagination.PaginatedMenu;

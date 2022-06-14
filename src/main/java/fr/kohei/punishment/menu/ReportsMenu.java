@@ -2,9 +2,9 @@ package fr.kohei.punishment.menu;
 
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.impl.PlayerCommands;
-import fr.kohei.common.RedisProvider;
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.Report;
+import fr.kohei.common.CommonProvider;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.Report;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.pagination.ConfirmationMenu;
 import fr.kohei.menu.pagination.PaginatedMenu;
@@ -100,7 +100,7 @@ public class ReportsMenu extends PaginatedMenu {
             builder.hideItemFlags();
             builder.setName("§c" + report.getUuid().toString().substring(0, 6));
             builder.addLoreLine(" ");
-            builder.addLoreLine("§8❘ §7Reporteur: §f" + RedisProvider.redisProvider.getProfile(report.getReporter()).getDisplayName());
+            builder.addLoreLine("§8❘ §7Reporteur: §f" + CommonProvider.getInstance().getProfile(report.getReporter()).getDisplayName());
             builder.addLoreLine("§8❘ §7Date: §6" + TimeUtil.formatDate(report.getDate().getTime()));
 
             builder.addLoreLine("§8❘ §7Message:");

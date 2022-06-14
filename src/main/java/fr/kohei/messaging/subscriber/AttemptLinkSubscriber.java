@@ -1,8 +1,8 @@
 package fr.kohei.messaging.subscriber;
 
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.common.messaging.pigdin.PacketListener;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.utils.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.utils.messaging.pigdin.PacketListener;
 import fr.kohei.messaging.packet.AttemptLinkPacket;
 import fr.kohei.utils.ChatUtil;
 import net.md_5.bungee.api.chat.ClickEvent;

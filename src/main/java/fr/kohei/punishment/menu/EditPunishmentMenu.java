@@ -1,8 +1,8 @@
 package fr.kohei.punishment.menu;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.GlassMenu;
 import fr.kohei.menu.Menu;

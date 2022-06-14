@@ -3,9 +3,9 @@ package fr.kohei.command.impl;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.Command;
 import fr.kohei.command.param.Param;
-import fr.kohei.common.RedisProvider;
-import fr.kohei.common.cache.ProfileData;
-import fr.kohei.common.cache.Report;
+import fr.kohei.common.CommonProvider;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.Report;
 import fr.kohei.menu.pagination.ConfirmationMenu;
 import fr.kohei.messaging.packet.LinkSuccessPacket;
 import fr.kohei.punishment.menu.ReportMenu;
@@ -34,9 +34,9 @@ public class PlayerCommands {
 
     @Command(names = "chatreport")
     public static void report(Player sender, @Param(name = "name") String name, @Param(name = "message", wildcard = true) String message) {
-        if (name.startsWith("attempt;")) {
-            name = name.replaceFirst("attempt;name:", "");
-            message = message.replaceFirst("message:", "");
+        if (name.startsWith("confirm;")) {
+            name = name.replaceFirst("confirm;name:", "");
+            message = message.replaceFirst("message:", ":");
             sender.sendMessage(ChatUtil.prefix("&fVous êtes sur le point de report le message de &c" + name));
             TextComponent textComponent = new TextComponent(ChatUtil.translate("&a&l[CONFIRMER]"));
             textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + name + " message:" + message));
@@ -55,7 +55,7 @@ public class PlayerCommands {
         }
 
         if (BukkitAPI.getChatReportManager().getCooldown().getOrDefault(sender.getUniqueId(), false)) {
-            sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 120 secondes avant de report un autre message."));
+            sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 60 secondes avant de report un autre message."));
             return;
         }
 
@@ -100,6 +100,11 @@ public class PlayerCommands {
 
     @Command(names = {"report"})
     public static void report(Player sender, @Param(name = "target") Player target) {
+        if (BukkitAPI.getChatReportManager().getCooldown().getOrDefault(sender.getUniqueId(), false)) {
+            sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 60 secondes avant de report un joueur."));
+            return;
+        }
+
         new ReportMenu(target).openMenu(sender);
     }
 
@@ -175,7 +180,7 @@ public class PlayerCommands {
 
     public static UUID fromString(String string) {
 
-        for (Map.Entry<UUID, ProfileData> entry : RedisProvider.redisProvider.players.entrySet()) {
+        for (Map.Entry<UUID, ProfileData> entry : CommonProvider.getInstance().players.entrySet()) {
             UUID uuid = entry.getKey();
             ProfileData profileData = entry.getValue();
             if (profileData.getDisplayName().equalsIgnoreCase(string)) {
@@ -188,7 +193,7 @@ public class PlayerCommands {
 
     public static ProfileData getProfile(String string) {
 
-        for (Map.Entry<UUID, ProfileData> entry : RedisProvider.redisProvider.players.entrySet()) {
+        for (Map.Entry<UUID, ProfileData> entry : CommonProvider.getInstance().players.entrySet()) {
             UUID uuid = entry.getKey();
             ProfileData profileData = entry.getValue();
             if (profileData.getDisplayName().equalsIgnoreCase(string)) {
