@@ -1,13 +1,12 @@
 package fr.kohei.punishment.menu;
 
+import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.Menu;
 import fr.kohei.menu.pagination.PaginatedMenu;
 import fr.kohei.punishment.Punishments;
 import fr.kohei.utils.ItemBuilder;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PunishmentCategoryMenu extends PaginatedMenu {
 
-    private final OfflinePlayer target;
+    private final ProfileData target;
     private final Menu oldMenu;
 
     @Override
@@ -28,7 +27,7 @@ public class PunishmentCategoryMenu extends PaginatedMenu {
 
     @Override
     public String getPrePaginatedTitle(Player p0) {
-        return "SS " + target.getName();
+        return "SS " + target.getDisplayName();
     }
 
     @Override

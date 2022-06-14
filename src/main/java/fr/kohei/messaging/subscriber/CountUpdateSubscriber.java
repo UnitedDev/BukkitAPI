@@ -2,8 +2,8 @@ package fr.kohei.messaging.subscriber;
 
 import fr.kohei.BukkitAPI;
 import fr.kohei.messaging.packet.CountUpdatePacket;
-import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.common.messaging.pigdin.PacketListener;
+import fr.kohei.common.utils.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.utils.messaging.pigdin.PacketListener;
 
 public class CountUpdateSubscriber implements PacketListener {
 

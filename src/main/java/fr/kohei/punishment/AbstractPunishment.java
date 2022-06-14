@@ -1,6 +1,6 @@
 package fr.kohei.punishment;
 
-import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.utils.TimeUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

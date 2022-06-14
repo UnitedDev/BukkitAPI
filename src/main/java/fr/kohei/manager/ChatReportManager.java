@@ -20,7 +20,7 @@ public class ChatReportManager {
         cooldown.put(uuid, true);
         Bukkit.getScheduler().runTaskLaterAsynchronously(BukkitAPI.getPlugin(), () -> {
             cooldown.put(uuid, false);
-        }, 120 * 20);
+        }, 60 * 20);
     }
 
 }

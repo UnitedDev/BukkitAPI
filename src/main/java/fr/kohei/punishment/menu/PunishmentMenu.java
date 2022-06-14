@@ -1,7 +1,9 @@
 package fr.kohei.punishment.menu;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.command.impl.PlayerCommands;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.Menu;
 import fr.kohei.menu.pagination.ConfirmationMenu;
@@ -11,7 +13,6 @@ import fr.kohei.punishment.Punishments;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.ItemBuilder;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -23,13 +24,13 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class PunishmentMenu extends PaginatedMenu {
-    private final OfflinePlayer target;
+    private final ProfileData target;
     private final Punishments.PunishCategory category;
     private final Menu oldMenu;
 
     @Override
     public String getPrePaginatedTitle(Player p0) {
-        return "SS " + target.getName();
+        return "SS " + target.getDisplayName();
     }
 
     @Override
@@ -57,7 +58,7 @@ public class PunishmentMenu extends PaginatedMenu {
         @Override
         public ItemStack getButtonItem(Player p0) {
             return new ItemBuilder(punishments.getMaterial()).setName("&c" + punishments.getDisplay()).setLore(
-                    "&fCliquez-ici pour sanctionner &c" + target.getName(),
+                    "&fCliquez-ici pour sanctionner &c" + target.getDisplayName(),
                     "",
                     "&8❘ &7Catégorie: &c" + getDisplay(punishments.getAbstractPunishment().getPunishmentAdapters().get(0).getType()),
                     "",
@@ -84,7 +85,7 @@ public class PunishmentMenu extends PaginatedMenu {
             }
 
             new ConfirmationMenu(() -> {
-                int count = (int) BukkitAPI.getCommonAPI().getPunishments(target.getUniqueId()).stream()
+                int count = (int) BukkitAPI.getCommonAPI().getPunishments(PlayerCommands.fromString(target.getDisplayName())).stream()
                         .filter(pd -> pd.getReason().equalsIgnoreCase(punishments.getDisplay()))
                         .count();
 
@@ -98,7 +99,7 @@ public class PunishmentMenu extends PaginatedMenu {
 
                 PunishmentData punishmentData = new PunishmentData(
                         punishmentAdapter.getType(),
-                        target.getUniqueId(),
+                        PlayerCommands.fromString(target.getDisplayName()),
                         player.getUniqueId(),
                         punishments.getDisplay(),
                         punishmentAdapter.getDuration()

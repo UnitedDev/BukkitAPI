@@ -1,14 +1,15 @@
 package fr.kohei.messaging.packet;
 
+import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.common.utils.messaging.pigdin.Packet;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class CountUpdatePacket implements Packet {
+public class LinkSuccessPacket implements Packet {
 
-    private final int normalPlayers;
-    private final int totalPlayers;
+    private final ProfileData data;
+    private final String discordId;
 
 }

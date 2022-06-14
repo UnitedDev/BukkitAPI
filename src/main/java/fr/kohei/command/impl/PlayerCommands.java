@@ -3,23 +3,46 @@ package fr.kohei.command.impl;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.Command;
 import fr.kohei.command.param.Param;
+import fr.kohei.common.CommonProvider;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.Report;
+import fr.kohei.menu.pagination.ConfirmationMenu;
+import fr.kohei.messaging.packet.LinkSuccessPacket;
+import fr.kohei.punishment.menu.ReportMenu;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.DiscordWebhook;
+import fr.kohei.utils.ItemBuilder;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import java.awt.*;
 import java.lang.management.ManagementFactory;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerCommands {
 
     @Command(names = "chatreport")
     public static void report(Player sender, @Param(name = "name") String name, @Param(name = "message", wildcard = true) String message) {
+        if (name.startsWith("confirm;")) {
+            name = name.replaceFirst("confirm;name:", "");
+            message = message.replaceFirst("message:", ":");
+            sender.sendMessage(ChatUtil.prefix("&fVous êtes sur le point de report le message de &c" + name));
+            TextComponent textComponent = new TextComponent(ChatUtil.translate("&a&l[CONFIRMER]"));
+            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport name:" + name + " message:" + message));
+            sender.spigot().sendMessage(textComponent);
+        }
+
         if (!name.startsWith("name:")) return;
         if (!message.startsWith("message:")) return;
 
@@ -32,7 +55,7 @@ public class PlayerCommands {
         }
 
         if (BukkitAPI.getChatReportManager().getCooldown().getOrDefault(sender.getUniqueId(), false)) {
-            sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 120 secondes avant de report un autre message."));
+            sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 60 secondes avant de report un autre message."));
             return;
         }
 
@@ -48,11 +71,13 @@ public class PlayerCommands {
                 .setFooter("Chat Report", DiscordWebhook.LOGO_URL)
         );
         webhook.execute();
+
+        BukkitAPI.getCommonAPI().addReport(new Report(new Date(), UUID.randomUUID(), fromString(name), sender.getUniqueId(), message, false));
     }
 
-    @Command( names = {"ping"})
+    @Command(names = {"ping"})
     public static void execute(Player sender, @Param(name = "target", defaultValue = "self") Player target) {
-        if(target == sender) {
+        if (target == sender) {
             sender.sendMessage(ChatUtil.translate("&7▎ &fVotre Ping: &a" + getPing(sender) + "ms&f."));
         } else {
             sender.sendMessage(ChatUtil.translate("&7▎ &fLe ping de &a" + target.getName() + " &fest de &a" + getPing(target) + "ms&f."));
@@ -71,6 +96,46 @@ public class PlayerCommands {
             }
             BukkitAPI.sendToServer(sender, BukkitAPI.getFactory(BukkitAPI.getCommonAPI().getServerCache().findBestLobbyFor(sender.getUniqueId()).getPort()).getName());
         }
+    }
+
+    @Command(names = {"report"})
+    public static void report(Player sender, @Param(name = "target") Player target) {
+        if (BukkitAPI.getChatReportManager().getCooldown().getOrDefault(sender.getUniqueId(), false)) {
+            sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 60 secondes avant de report un joueur."));
+            return;
+        }
+
+        new ReportMenu(target).openMenu(sender);
+    }
+
+    @Command(names = {"acceptlink"})
+    public static void acceptLink(Player sender, @Param(name = "data") String data) {
+        data = data.replaceFirst("id;", "");
+        String finalData = data;
+        new ConfirmationMenu(() -> {
+            ProfileData profile = BukkitAPI.getCommonAPI().getProfile(sender.getUniqueId());
+            if (!profile.getLink().equals("")) {
+                sender.sendMessage(ChatUtil.prefix("&cIl semblerait que votre compte Minecraft est déjà lié à un compte Discord."));
+                return;
+            }
+
+            BukkitAPI.getCommonAPI().getMessaging().sendPacket(new LinkSuccessPacket(profile, finalData));
+            sender.sendMessage(ChatUtil.prefix("&aVotre compte Minecraft a bien été lié à votre compte Discord."));
+        }, new ItemBuilder(Material.PAPER).setName("&cLink").toItemStack(), null).openMenu(sender);
+    }
+
+    @Command(names = {"unlink"})
+    public static void unlink(Player sender) {
+        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(sender.getUniqueId());
+        if (profile.getLink().equals("") || profile.getLink() == null) {
+            sender.sendMessage(ChatUtil.prefix("&cIl semblerait que votre compte Minecraft n'est pas lié à un compte Discord."));
+            return;
+        }
+        new ConfirmationMenu(() -> {
+            profile.setLink("");
+            BukkitAPI.getCommonAPI().saveProfile(sender.getUniqueId(), profile);
+        }, new ItemBuilder(Material.PAPER).setName("&cUnlink").toItemStack(), null).openMenu(sender);
+
 
     }
 
@@ -82,8 +147,7 @@ public class PlayerCommands {
     @Command(names = {"lag", "tps"}, power = 39)
     public static void execute(Player sender) {
         StringBuilder sb = new StringBuilder(" ");
-        for (double tps : MinecraftServer.getServer().recentTps)
-        {
+        for (double tps : MinecraftServer.getServer().recentTps) {
             sb.append(format(tps));
             sb.append(", ");
         }
@@ -108,10 +172,36 @@ public class PlayerCommands {
         }
         sender.sendMessage(" ");
     }
-    static String format(double tps)
-    {
-        return ( ( tps > 18.0 ) ? ChatColor.GREEN : ( tps > 16.0 ) ? ChatColor.YELLOW : ChatColor.RED )
-                + ( ( tps > 20.0 ) ? "*" : "" ) + Math.min( Math.round( tps * 100.0 ) / 100.0, 20.0 );
+
+    static String format(double tps) {
+        return ((tps > 18.0) ? ChatColor.GREEN : (tps > 16.0) ? ChatColor.YELLOW : ChatColor.RED)
+                + ((tps > 20.0) ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 20.0);
+    }
+
+    public static UUID fromString(String string) {
+
+        for (Map.Entry<UUID, ProfileData> entry : CommonProvider.getInstance().players.entrySet()) {
+            UUID uuid = entry.getKey();
+            ProfileData profileData = entry.getValue();
+            if (profileData.getDisplayName().equalsIgnoreCase(string)) {
+                return uuid;
+            }
+        }
+
+        return null;
+    }
+
+    public static ProfileData getProfile(String string) {
+
+        for (Map.Entry<UUID, ProfileData> entry : CommonProvider.getInstance().players.entrySet()) {
+            UUID uuid = entry.getKey();
+            ProfileData profileData = entry.getValue();
+            if (profileData.getDisplayName().equalsIgnoreCase(string)) {
+                return profileData;
+            }
+        }
+
+        return null;
     }
 
 }

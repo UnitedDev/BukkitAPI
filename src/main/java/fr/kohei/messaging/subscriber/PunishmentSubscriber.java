@@ -1,13 +1,13 @@
 package fr.kohei.messaging.subscriber;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.cache.ProfileData;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.messaging.packet.PunishmentPacket;
-import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.common.messaging.pigdin.PacketListener;
+import fr.kohei.common.utils.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.utils.messaging.pigdin.PacketListener;
 import fr.kohei.utils.ChatUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class PunishmentSubscriber implements PacketListener {
@@ -25,7 +25,7 @@ public class PunishmentSubscriber implements PacketListener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             ProfileData profile1 = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
 
-            if(!packet.isAnnounce()) break;
+            if (!packet.isAnnounce()) break;
 
             if (profile1.getRank().getPermissionPower() >= 39) {
                 if (packet.getAccepter() == null) {
@@ -38,7 +38,8 @@ public class PunishmentSubscriber implements PacketListener {
                 }
             }
 
-            if(packet.getData().getPunished().equals(player.getUniqueId())) {
+            if (packet.getData().getPunished().equals(player.getUniqueId())) {
+                if (packet.getData().getPunishmentType() == PunishmentData.PunishmentType.MUTE) return;
                 Bukkit.getScheduler().runTask(BukkitAPI.getPlugin(), () -> player.kickPlayer(BukkitAPI.getPunishmentManager().getKickMessage(packet.getData())));
             }
         }

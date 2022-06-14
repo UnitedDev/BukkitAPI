@@ -1,8 +1,8 @@
 package fr.kohei.command.param.defaults;
 
 
-import fr.kohei.utils.ChatUtil;
 import fr.kohei.command.param.ParameterType;
+import fr.kohei.utils.ChatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

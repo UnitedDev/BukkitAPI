@@ -1,7 +1,9 @@
 package fr.kohei.punishment.menu;
 
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.cache.PunishmentData;
+import fr.kohei.command.impl.PlayerCommands;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.Menu;
 import fr.kohei.menu.pagination.PaginatedMenu;
@@ -9,9 +11,7 @@ import fr.kohei.utils.Heads;
 import fr.kohei.utils.ItemBuilder;
 import fr.kohei.utils.TimeUtil;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -25,14 +25,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HistoryMenu extends PaginatedMenu {
 
-    private final OfflinePlayer target;
+    private final ProfileData target;
     private final Menu oldMenu;
 
     private PunishmentData.PunishmentType type = PunishmentData.PunishmentType.BAN;
 
     @Override
     public String getPrePaginatedTitle(Player p0) {
-        return "Historique " + target.getName();
+        return "Historique " + target.getDisplayName();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class HistoryMenu extends PaginatedMenu {
     public Map<Integer, Button> getAllPagesButtons(Player player) {
         Map<Integer, Button> buttons = new HashMap<>();
 
-        for (PunishmentData punishment : BukkitAPI.getCommonAPI().getPunishments(target.getUniqueId()))
+        for (PunishmentData punishment : BukkitAPI.getCommonAPI().getPunishments(PlayerCommands.fromString(target.getDisplayName())))
             if (type == punishment.getPunishmentType())
                 buttons.put(buttons.size(), new PunishmentButton(punishment));
 

@@ -1,18 +1,17 @@
 package fr.kohei.messaging.subscriber;
 
-import com.google.common.io.BaseEncoding;
 import fr.kohei.BukkitAPI;
-import fr.kohei.common.RedisProvider;
-import fr.kohei.common.cache.ProfileData;
+import fr.kohei.common.CommonProvider;
+import fr.kohei.common.cache.data.ProfileData;
+import fr.kohei.common.utils.gson.GsonProvider;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
-import fr.kohei.common.messaging.pigdin.IncomingPacketHandler;
-import fr.kohei.common.messaging.pigdin.PacketListener;
+import fr.kohei.common.utils.messaging.pigdin.IncomingPacketHandler;
+import fr.kohei.common.utils.messaging.pigdin.PacketListener;
 import fr.kohei.utils.ChatUtil;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
 
@@ -38,7 +37,7 @@ public class PunishmentAskSubscriber implements PacketListener {
                     new TextComponent(ChatUtil.translate("&c⚠ &cAttention: &cVous devez vous assurer que la sanction a lieu d'être ! Si ce n'est pas le cas, vous serez tenu comme responsable."))
             }));
             UUID random = UUID.randomUUID();
-            BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(random, RedisProvider.redisProvider.GSON.toJson(packet));
+            BukkitAPI.getPunishmentManager().getGsonAskPunishment().put(random, GsonProvider.GSON.toJson(packet));
             accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/acceptban " + random));
 
             TextComponent decline = new TextComponent(ChatUtil.translate("&c&l[REFUSER]"));
