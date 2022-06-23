@@ -4,14 +4,17 @@ import fr.kohei.BukkitAPI;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.Menu;
 import fr.kohei.menu.pagination.ConfirmationMenu;
-import fr.kohei.report.Report;
+import fr.kohei.manager.report.Report;
+import fr.kohei.messaging.packet.MessagePacket;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.ItemBuilder;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.LightningStrike;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.*;
 
@@ -71,6 +74,18 @@ public class ReportMenu extends Menu {
                 );
                 BukkitAPI.getCommonAPI().addReport(report);
                 player.sendMessage(ChatUtil.prefix("&fVous avez report le joueur &c" + target.getName() + " &fpour &c" + value.getDisplay()));
+
+                String server = BukkitAPI.getCommonAPI().getServerCache().getPlayers().get(target.getUniqueId());
+                TextComponent teleport = new TextComponent(ChatUtil.translate("&a&l[TELEPORTATION AU SERVEUR]"));
+                teleport.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + server));
+                BukkitAPI.getCommonAPI().getMessaging().sendPacket(new MessagePacket(
+                        Arrays.asList(
+                                new TextComponent(ChatUtil.prefix("&c" + target.getName() + " &fvient de recevoir un report pour &c" + value.getDisplay()
+                                        + " &fpar &c" + player.getName())),
+                                teleport
+                        ),
+                        30
+                ));
                 player.closeInventory();
             }, getButtonItem(player), new ReportMenu(target)).openMenu(player);
         }

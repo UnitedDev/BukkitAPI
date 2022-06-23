@@ -8,7 +8,6 @@ import fr.kohei.common.cache.data.Report;
 import fr.kohei.menu.Button;
 import fr.kohei.menu.pagination.ConfirmationMenu;
 import fr.kohei.menu.pagination.PaginatedMenu;
-import fr.kohei.punishment.Punishments;
 import fr.kohei.utils.Heads;
 import fr.kohei.utils.ItemBuilder;
 import fr.kohei.utils.TimeUtil;
@@ -98,7 +97,7 @@ public class ReportsMenu extends PaginatedMenu {
             if (report.isResolved()) builder.setAmount(0);
             else builder.addEnchant(Enchantment.DAMAGE_ALL, 1);
             builder.hideItemFlags();
-            builder.setName("§c" + report.getUuid().toString().substring(0, 6));
+            builder.setName("§c" + report.getReportId().toString().substring(0, 6));
             builder.addLoreLine(" ");
             builder.addLoreLine("§8❘ §7Reporteur: §f" + CommonProvider.getInstance().getProfile(report.getReporter()).getDisplayName());
             builder.addLoreLine("§8❘ §7Date: §6" + TimeUtil.formatDate(report.getDate().getTime()));

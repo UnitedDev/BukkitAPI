@@ -8,6 +8,7 @@ import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.common.cache.data.Report;
 import fr.kohei.menu.pagination.ConfirmationMenu;
 import fr.kohei.messaging.packet.LinkSuccessPacket;
+import fr.kohei.messaging.packet.MessagePacket;
 import fr.kohei.punishment.menu.ReportMenu;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.DiscordWebhook;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 
 import java.awt.*;
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -72,7 +74,16 @@ public class PlayerCommands {
         );
         webhook.execute();
 
-        BukkitAPI.getCommonAPI().addReport(new Report(new Date(), UUID.randomUUID(), fromString(name), sender.getUniqueId(), message, false));
+        TextComponent teleport = new TextComponent(ChatUtil.translate("&a&l[REPORTS]"));
+        teleport.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/reports " + name));
+        BukkitAPI.getCommonAPI().getMessaging().sendPacket(new MessagePacket(
+                Arrays.asList(
+                        new TextComponent(ChatUtil.prefix("&c" + name + " &fvient de recevoir un chat report par &c" + sender.getName())),
+                        teleport
+                ),
+                30
+        ));
+        BukkitAPI.getCommonAPI().addReport(new Report(new Date(), UUID.randomUUID(), fromString(name), sender.getUniqueId(), " §8▪ §cChat: §f" + message.replaceFirst(":", ""), false));
     }
 
     @Command(names = {"ping"})
@@ -100,6 +111,11 @@ public class PlayerCommands {
 
     @Command(names = {"report"})
     public static void report(Player sender, @Param(name = "target") Player target) {
+        if(target.getUniqueId().equals(sender.getUniqueId())) {
+            sender.sendMessage(ChatUtil.prefix("&cVous êtes devenu fou ?"));
+            return;
+        }
+
         if (BukkitAPI.getChatReportManager().getCooldown().getOrDefault(sender.getUniqueId(), false)) {
             sender.sendMessage(ChatUtil.prefix("&cVeuillez attendre 60 secondes avant de report un joueur."));
             return;
