@@ -13,6 +13,7 @@ import fr.kohei.common.cache.data.Division;
 import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.manager.ChatReportManager;
 import fr.kohei.manager.PunishmentManager;
+import fr.kohei.staff.StaffManager;
 import fr.kohei.menu.MenuAPI;
 import fr.kohei.messaging.packet.*;
 import fr.kohei.messaging.subscriber.*;
@@ -40,6 +41,8 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
     private static ChatReportManager chatReportManager;
     @Getter
     private static PunishmentManager punishmentManager;
+    @Getter
+    private static StaffManager staffManager;
 
     @Getter
     @Setter
@@ -60,6 +63,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         commandHandler = new CommandHandler(plugin);
         chatReportManager = new ChatReportManager();
         punishmentManager = new PunishmentManager();
+        staffManager = new StaffManager();
 
         plugin.getServer().getPluginManager().registerEvents(new CustomItemListener(plugin), plugin);
         this.loadRedis();
@@ -92,6 +96,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         commonAPI.getMessaging().registerAdapter(UpdatePlayersPacket.class, new UpdatePlayersSubscriber());
         commonAPI.getMessaging().registerAdapter(AttemptLinkPacket.class, new AttemptLinkSubscriber());
         commonAPI.getMessaging().registerAdapter(LinkSuccessPacket.class, null);
+        commonAPI.getMessaging().registerAdapter(MessagePacket.class, new MessageSubscriber());
     }
 
     public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {

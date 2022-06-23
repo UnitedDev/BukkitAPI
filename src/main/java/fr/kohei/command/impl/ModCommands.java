@@ -1,5 +1,10 @@
 package fr.kohei.command.impl;
 
+import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketNotification;
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
+import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.Command;
 import fr.kohei.command.param.Param;
@@ -7,18 +12,23 @@ import fr.kohei.common.CommonProvider;
 import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.common.cache.data.PunishmentData;
 import fr.kohei.common.utils.gson.GsonProvider;
+import fr.kohei.staff.events.StaffDisableEvent;
+import fr.kohei.manager.grant.GrantsMenu;
 import fr.kohei.messaging.packet.PunishmentAskPacket;
 import fr.kohei.messaging.packet.PunishmentPacket;
-import fr.kohei.punishment.menu.HistoryMenu;
-import fr.kohei.punishment.menu.PunishmentCategoryMenu;
-import fr.kohei.punishment.menu.ReportsMenu;
+import fr.kohei.punishment.menu.*;
+import fr.kohei.staff.menu.FreezeMenu;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ModCommands {
 
@@ -162,6 +172,97 @@ public class ModCommands {
             new ReportsMenu(PlayerCommands.getProfile(target)).openMenu(sender);
     }
 
+    @Command(names = "warns", power = 25)
+    public static void warns(Player sender, @Param(name = "player") String target) {
+        new WarnsMenu(PlayerCommands.getProfile(target)).openMenu(sender);
+    }
+
+    @Command(names = "grants", power = 41)
+    public static void grants(Player sender, @Param(name = "player") String target) {
+        ProfileData targetProfile = PlayerCommands.getProfile(target);
+        new GrantsMenu(targetProfile).openMenu(sender);
+    }
+
+    @Command(names = {"freeze"}, power = 40)
+    public static void freeze(Player sender, @Param(name = "player") Player target) {
+        if (BukkitAPI.getStaffManager().getFreezePlayers().contains(target.getUniqueId())) {
+            sender.sendMessage(ChatUtil.prefix("&cCe joueur est déjà freeze."));
+            return;
+        }
+
+        new FreezeMenu().openMenu(target);
+        sender.sendMessage(ChatUtil.prefix("&fVous avez freeze &c" + target.getName()));
+        BukkitAPI.getStaffManager().getFreezePlayers().add(target.getUniqueId());
+    }
+
+    @Command(names = {"unfreeze"}, power = 40)
+    public static void unfreeze(Player sender, @Param(name = "player") Player target) {
+        if (!BukkitAPI.getStaffManager().getFreezePlayers().contains(target.getUniqueId())) {
+            sender.sendMessage(ChatUtil.prefix("&cCe joueur n'est pas freeze."));
+            return;
+        }
+
+        BukkitAPI.getStaffManager().getFreezePlayers().remove(target.getUniqueId());
+        target.closeInventory();
+        target.sendMessage(ChatUtil.prefix("&cVous avez été unfreeze."));
+        sender.sendMessage(ChatUtil.prefix("&fVous avez unfreeze &a" + target.getName()));
+    }
+
+    @Command(names = "warn", power = 39)
+    public static void warn(Player sender, @Param(name = "player") Player target, @Param(name = "raison", wildcard = true, defaultValue = "rien") String data) {
+        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(sender.getUniqueId());
+        ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(target.getUniqueId());
+
+        new PunishWarnMenu(target).openMenu(sender);
+    }
+
+    @Command(names = {"mod", "staff"}, power = 39)
+    public static void staff(Player sender) {
+        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(sender.getUniqueId());
+
+        ServiceInfoSnapshot server = BukkitAPI.getFactory(Bukkit.getPort());
+        if (profile.isStaff()) {
+            sender.sendMessage(ChatUtil.prefix("&cVous avez désactivé votre staff mod."));
+            if (!server.getName().contains("Lobby")) {
+                IPlayerManager manager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
+                manager.getPlayerExecutor(sender.getUniqueId()).connectToFallback();
+            } else {
+                Bukkit.getOnlinePlayers().forEach(player -> player.showPlayer(sender));
+                sender.getInventory().clear();
+                sender.getInventory().setArmorContents(null);
+            }
+            Bukkit.getPluginManager().callEvent(new StaffDisableEvent(sender, profile));
+            LunarClientAPI.getInstance().disableAllStaffModules(sender);
+            Bukkit.getOnlinePlayers().forEach(player -> LunarClientAPI.getInstance().resetNametag(sender, player));
+
+            profile.setStaff(false);
+            profile.setVanish(false);
+            BukkitAPI.getCommonAPI().saveProfile(sender.getUniqueId(), profile);
+            return;
+        }
+        if (!server.getName().contains("Lobby")) {
+            sender.sendMessage(ChatUtil.prefix("&cVous devez être sur un lobby pour activer le staff mod."));
+            return;
+        }
+
+        sender.setAllowFlight(true);
+        BukkitAPI.getStaffManager().giveInventory(sender.getPlayer());
+        sender.setGameMode(GameMode.SURVIVAL);
+        Bukkit.getOnlinePlayers().forEach(player -> player.hidePlayer(sender));
+        profile.setStaff(true);
+        profile.setVanish(true);
+        BukkitAPI.getCommonAPI().saveProfile(sender.getUniqueId(), profile);
+        sender.sendMessage(ChatUtil.prefix("&fVous avez &aactivé &fvotre staff mod."));
+
+        Bukkit.getOnlinePlayers().forEach(target -> {
+            if (LunarClientAPI.getInstance().isRunningLunarClient(target))
+                LunarClientAPI.getInstance().overrideNametag(sender, Arrays.asList(
+                        ChatUtil.translate("&f(&cStaff Mod&f)"),
+                        ChatUtil.translate(profile.getRank().getChatPrefix() + " " + sender.getName())
+                ), target);
+        });
+    }
+
     @Command(names = "unban", power = 40)
     public static void unban(Player sender, @Param(name = "player") String target, @Param(name = "raison", wildcard = true) String reason) {
         if (BukkitAPI.getPunishmentManager().getBan(PlayerCommands.fromString(target)) == null) {
@@ -262,10 +363,22 @@ public class ModCommands {
     public static void staffList(Player player) {
         player.sendMessage(" ");
         player.sendMessage(ChatUtil.translate("&8» &c&lStaff List"));
-        BukkitAPI.getCommonAPI().getServerCache().getPlayers().forEach((uuid, s) -> {
-            ProfileData data = BukkitAPI.getCommonAPI().getProfile(uuid);
+        List<ProfileData> profiles = BukkitAPI.getCommonAPI().getServerCache().getPlayers().keySet()
+                .stream()
+                .map(uuid -> BukkitAPI.getCommonAPI().getProfile(uuid))
+                .filter(profileData -> profileData.getRank().getPermissionPower() >= 25)
+                .sorted(Comparator.comparingInt(o -> ((ProfileData) o).getRank().getPermissionPower()).reversed())
+                .collect(Collectors.toList());
+
+        profiles.forEach(data -> {
+            UUID uuid = PlayerCommands.fromString(data.getDisplayName());
+            String server = BukkitAPI.getCommonAPI().getServerCache().getPlayers().get(uuid);
             String executorDisplay = data.getRank().getTabPrefix() + " " + data.getDisplayName();
-            player.sendMessage(ChatUtil.translate(" &7■ " + executorDisplay));
+            if (!data.isVanish())
+                player.sendMessage(ChatUtil.translate(" &7■ " + executorDisplay + " &f(&c" + server + "&f)"));
+            else if (CommonProvider.getInstance().getProfile(player.getUniqueId()).getRank().getPermissionPower() >= 25) {
+                player.sendMessage(ChatUtil.translate(" &7■ " + executorDisplay + " &f(&c" + server + "&f) &f(&aVanish&f)"));
+            }
         });
         player.sendMessage(" ");
     }

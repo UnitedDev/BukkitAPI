@@ -2,11 +2,13 @@ package fr.kohei.command;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.lunarclient.bukkitapi.LunarClientAPI;
 import fr.kohei.BukkitAPI;
 import fr.kohei.command.param.Param;
 import fr.kohei.command.param.ParameterData;
 import fr.kohei.command.param.ParameterType;
 import fr.kohei.command.param.defaults.*;
+import fr.kohei.common.CommonProvider;
 import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.utils.ChatUtil;
 import fr.kohei.utils.Reflection;
@@ -421,7 +423,7 @@ public class CommandHandler implements Listener {
 
         if (profile.getRank().permissionPower() >= 10) {
             profile.setHosts(-1);
-            if(profile.getIps().contains(player.getAddress().getHostName())) {
+            if (profile.getIps().contains(player.getAddress().getHostName())) {
                 profile.getIps().add(player.getAddress().getHostName());
                 BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
             }
@@ -429,6 +431,15 @@ public class CommandHandler implements Listener {
 
         profile.setLastLogin(new Date());
         BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+
+        if (LunarClientAPI.getInstance().isRunningLunarClient(player))
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(player1 -> CommonProvider.getInstance().getProfile(player1.getUniqueId()).isStaff())
+                    .forEach(player1 -> LunarClientAPI.getInstance().overrideNametag(player1, Arrays.asList(
+                            ChatUtil.translate("&f(&cStaff Mod&f)"),
+                            ChatUtil.translate(profile.getRank().getChatPrefix() + " " + player1.getName())
+                    ), player));
+
     }
 
     @EventHandler
@@ -438,6 +449,15 @@ public class CommandHandler implements Listener {
         ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
         profile.setPlayTime(profile.getPlayTime() - (profile.getLastLogin().getTime() - System.currentTimeMillis()));
         BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
+
+        if (BukkitAPI.getStaffManager().getFreezePlayers().contains(player.getUniqueId())) {
+            BukkitAPI.getStaffManager().getFreezePlayers().remove(player.getUniqueId());
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(player1 -> CommonProvider.getInstance().getProfile(player1.getUniqueId()).isStaff())
+                    .forEach(player1 -> {
+                        player1.sendMessage(ChatUtil.prefix("&c" + player.getName() + " &fa quitté le serveur en étant &cfreeze&f."));
+                    });
+        }
     }
 
     @EventHandler

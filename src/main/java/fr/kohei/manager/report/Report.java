@@ -1,4 +1,4 @@
-package fr.kohei.report;
+package fr.kohei.manager.report;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
