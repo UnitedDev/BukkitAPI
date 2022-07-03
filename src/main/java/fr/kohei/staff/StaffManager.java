@@ -1,5 +1,6 @@
 package fr.kohei.staff;
 
+import com.lunarclient.bukkitapi.LunarClientAPI;
 import fr.kohei.BukkitAPI;
 import fr.kohei.common.cache.data.ProfileData;
 import fr.kohei.menu.pagination.ConfirmationMenu;
@@ -257,6 +258,7 @@ public class StaffManager implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
         player.setAllowFlight(true);
         giveInventory(player);
+        if (LunarClientAPI.getInstance().isRunningLunarClient(player)) LunarClientAPI.getInstance().giveAllStaffModules(player);
     }
 
     @EventHandler
