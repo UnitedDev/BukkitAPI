@@ -64,6 +64,7 @@ public class StaffManager implements Listener {
                 .setName("&8❘ &c&lFreeze &8(&7Clic-droit&8)").toItemStack());
         player.getInventory().setItem(8, new ItemBuilder(Heads.NEXT_PAGE.toItemStack())
                 .setName("&8❘ &c&lProchaine Page &8(&7Clic-droit&8)").toItemStack());
+        if (LunarClientAPI.getInstance().isRunningLunarClient(player)) LunarClientAPI.getInstance().giveAllStaffModules(player);
     }
 
     public void giveSecondInventory(Player player) {
@@ -87,6 +88,7 @@ public class StaffManager implements Listener {
                 .setName("&8❘ &c&lGamemode &8(&7Clic-droit&8)").toItemStack());
         player.getInventory().setItem(8, new ItemBuilder(Material.INK_SACK).setDurability(1)
                 .setName("&8❘ &c&lMode Normal &8(&7Clic-droit&8)").toItemStack());
+        if (LunarClientAPI.getInstance().isRunningLunarClient(player)) LunarClientAPI.getInstance().giveAllStaffModules(player);
     }
 
     @EventHandler
@@ -258,7 +260,6 @@ public class StaffManager implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
         player.setAllowFlight(true);
         giveInventory(player);
-        if (LunarClientAPI.getInstance().isRunningLunarClient(player)) LunarClientAPI.getInstance().giveAllStaffModules(player);
     }
 
     @EventHandler
