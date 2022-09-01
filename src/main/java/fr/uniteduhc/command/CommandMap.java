@@ -4,7 +4,9 @@ package fr.uniteduhc.command;
 import org.bukkit.Server;
 import org.bukkit.command.SimpleCommandMap;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 final class CommandMap extends SimpleCommandMap {
 
@@ -94,6 +96,7 @@ final class CommandMap extends SimpleCommandMap {
 ////                }
 ////
 ////                completionList.addAll(vanillaCompletionList);
+//
 //            }
 //            completionList.sort((o1, o2) -> (o2.length() - o1.length()));
 //

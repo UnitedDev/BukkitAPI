@@ -6,19 +6,21 @@ import com.google.common.io.ByteStreams;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import fr.uniteduhc.command.CommandHandler;
-import fr.uniteduhc.command.impl.ModCommands;
-import fr.uniteduhc.command.impl.PlayerCommands;
 import fr.uniteduhc.common.api.CommonAPI;
 import fr.uniteduhc.common.cache.data.Division;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.manager.ChatReportManager;
 import fr.uniteduhc.manager.PunishmentManager;
+import fr.uniteduhc.manager.commands.ModCommands;
+import fr.uniteduhc.manager.commands.PlayerCommands;
+import fr.uniteduhc.manager.listeners.PlayerListeners;
 import fr.uniteduhc.menu.MenuAPI;
+import fr.uniteduhc.messaging.packet.*;
 import fr.uniteduhc.messaging.subscriber.*;
 import fr.uniteduhc.staff.StaffManager;
 import fr.uniteduhc.utils.ChatUtil;
+import fr.uniteduhc.utils.CommandsRemover;
 import fr.uniteduhc.utils.item.CustomItemListener;
-import fr.uniteduhc.messaging.packet.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -70,7 +72,7 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
         this.registerCommands();
         this.registerListeners();
 
-        this.getServer().getScheduler().runTaskLater(this, CommandHandler::deleteCommands, 2 * 20);
+        Bukkit.getScheduler().runTaskLater(this, CommandsRemover::deleteCommands, 5 * 20);
     }
 
     public static ServiceInfoSnapshot getFactory(int port) {
@@ -81,11 +83,13 @@ public class BukkitAPI extends JavaPlugin implements PluginMessageListener {
 
     private void registerListeners() {
         PluginManager pluginManager = this.getServer().getPluginManager();
+
+        pluginManager.registerEvents(new PlayerListeners(), this);
     }
 
     private void registerCommands() {
-        commandHandler.registerClass(ModCommands.class);
-        commandHandler.registerClass(PlayerCommands.class);
+        commandHandler.registerCommands(ModCommands.class);
+        commandHandler.registerCommands(PlayerCommands.class);
     }
 
     private void loadRedis() {

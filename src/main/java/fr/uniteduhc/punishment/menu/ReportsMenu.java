@@ -1,7 +1,7 @@
 package fr.uniteduhc.punishment.menu;
 
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.impl.PlayerCommands;
+import fr.uniteduhc.manager.commands.PlayerCommands;
 import fr.uniteduhc.common.CommonProvider;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.common.cache.data.Report;
@@ -77,7 +77,7 @@ public class ReportsMenu extends PaginatedMenu {
                 buttons.put(buttons.size(), new PlayerDisplayButton(data, uuid));
             }
         } else {
-            final UUID uuid = PlayerCommands.fromString(profile.getDisplayName());
+            final UUID uuid = profile.getUniqueId();
             for (Report report : BukkitAPI.getCommonAPI().getReports().stream().filter(report -> report.getUuid().equals(uuid)).collect(Collectors.toList())) {
                 if (report.isResolved() && !all) continue;
                 buttons.put(buttons.size(), new ReportButton(report));

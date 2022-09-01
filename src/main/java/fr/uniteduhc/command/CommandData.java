@@ -1,7 +1,8 @@
 package fr.uniteduhc.command;
 
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.param.ParameterData;
+import fr.uniteduhc.command.annotations.Command;
+import fr.uniteduhc.command.annotations.ParameterData;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.utils.ChatUtil;
 import lombok.Getter;

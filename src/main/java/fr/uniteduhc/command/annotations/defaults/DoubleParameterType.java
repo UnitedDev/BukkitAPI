@@ -1,7 +1,6 @@
-package fr.uniteduhc.command.param.defaults;
+package fr.uniteduhc.command.annotations.defaults;
 
-
-import fr.uniteduhc.command.param.ParameterType;
+import fr.uniteduhc.command.annotations.ParameterType;
 import fr.uniteduhc.utils.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -11,18 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class FloatParameterType implements ParameterType<Float> {
+public class DoubleParameterType implements ParameterType<Double> {
 
-    public Float transform(CommandSender sender, String source) {
+    public Double transform(CommandSender sender, String source) {
         if (source.toLowerCase().contains("e")) {
             sender.sendMessage(ChatUtil.prefix(ChatColor.RED + source + " n'est pas un nombre valide."));
             return (null);
         }
 
         try {
-            float parsed = Float.parseFloat(source);
+            double parsed = Double.parseDouble(source);
 
-            if (Float.isNaN(parsed) || !Float.isFinite(parsed)) {
+            if (Double.isNaN(parsed) || !Double.isFinite(parsed)) {
                 sender.sendMessage(ChatUtil.prefix("&cCe nombre n'est pas valide"));
                 return (null);
             }

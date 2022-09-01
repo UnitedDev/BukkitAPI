@@ -2,33 +2,26 @@ package fr.uniteduhc.command;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.lunarclient.bukkitapi.LunarClientAPI;
-import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.param.Param;
-import fr.uniteduhc.command.param.ParameterData;
-import fr.uniteduhc.command.param.ParameterType;
-import fr.uniteduhc.common.CommonProvider;
+import fr.uniteduhc.command.annotations.Command;
+import fr.uniteduhc.command.annotations.Param;
+import fr.uniteduhc.command.annotations.ParameterData;
+import fr.uniteduhc.command.annotations.ParameterType;
+import fr.uniteduhc.command.annotations.defaults.*;
 import fr.uniteduhc.common.cache.data.ProfileData;
-import fr.uniteduhc.command.param.defaults.*;
 import fr.uniteduhc.utils.ChatUtil;
 import fr.uniteduhc.utils.Reflection;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,8 +30,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CommandHandler implements Listener {
 
@@ -69,7 +64,7 @@ public class CommandHandler implements Listener {
      *
      * @param registeredClass The class to scan/register.
      */
-    public void registerClass(Class<?> registeredClass) {
+    public void registerCommands(Class<?> registeredClass) {
 
         for (Method method : registeredClass.getMethods()) {
             if (method.getAnnotation(Command.class) != null) {
@@ -248,6 +243,7 @@ public class CommandHandler implements Listener {
         registerParameterType(OfflinePlayer.class, new OfflinePlayerParameterType());
         registerParameterType(Player.class, new PlayerParameterType());
         registerParameterType(String.class, new StringParameterType());
+        registerParameterType(ProfileData.class, new ProfileParameterType());
 
         // Run this on a delay so everything is registered.
         // Not really needed, but it's nice to play it safe.
@@ -284,7 +280,7 @@ public class CommandHandler implements Listener {
                 }
             }
 
-        }.runTaskLater(plugin, 10L);
+        }.runTaskLater(plugin, 5L);
 
     }
 
@@ -309,174 +305,11 @@ public class CommandHandler implements Listener {
         }
     }
 
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
-        if (event.getReason().equalsIgnoreCase("disconnect.spam")) event.setCancelled(true);
-        if (event.getReason().contains("Flying is not enabled")) event.setCancelled(true);
-    }
-
-    public static class SimpleCommand extends org.bukkit.command.Command {
-        public SimpleCommand(String name) {
-            super(name);
-        }
-
-        @Override
-        public boolean execute(CommandSender commandSender, String s, String[] strings) {
-            return false;
-        }
-    }
-
     @SneakyThrows
     public static SimpleCommandMap getCommandMap() {
         final Class<?> craftServerClass = Reflection.getOBCClass("CraftServer");
         assert craftServerClass != null;
         final Method getCommandMapMethod = craftServerClass.getMethod("getCommandMap");
         return (SimpleCommandMap) getCommandMapMethod.invoke(craftServerClass.cast(Bukkit.getServer()), new Object[0]);
-    }
-
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public static void deleteCommands() {
-        Field field = SimpleCommandMap.class.getDeclaredField("knownCommands");
-        field.setAccessible(true);
-
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        ConcurrentHashMap<String, org.bukkit.command.Command> commands = new ConcurrentHashMap<>((HashMap<String, org.bukkit.command.Command>) field.get(getCommandMap()));
-
-        commands.keySet().forEach(s -> {
-            org.bukkit.command.Command command = commands.get(s);
-            if (command.getName().equalsIgnoreCase("mumble")) return;
-            if (command.getName().equalsIgnoreCase("imanityspigot")) return;
-            if (command.getName().equalsIgnoreCase("imanity")) return;
-            if (command.getName().equalsIgnoreCase("ispigot")) return;
-            if (command.getName().equalsIgnoreCase("timings")) return;
-            if (command.getName().equalsIgnoreCase("joinqueue")) return;
-            if (command.getName().equalsIgnoreCase("datadump")) return;
-            if (command.getName().equalsIgnoreCase("forcesend")) return;
-            if (command.getName().equalsIgnoreCase("joinqueue")) return;
-            if (command.getName().equalsIgnoreCase("leavequeue")) return;
-            if (command.getName().equalsIgnoreCase("queueclear")) return;
-            if (command.getName().equalsIgnoreCase("queuetoggle")) return;
-            command.unregister(getCommandMap());
-            commands.remove(s);
-        });
-
-        field.set(getCommandMap(), commands);
-        BukkitAPI.getCommandHandler().hook();
-
-        CommandHandler.getCommands().forEach(commandData ->
-                getCommandMap().register("", new SimpleCommand(commandData.getName().split(" ")[0]))
-        );
-        getCommandMap().register("", new SimpleCommand("ignore"));
-        getCommandMap().register("", new SimpleCommand("msg"));
-        getCommandMap().register("", new SimpleCommand("message"));
-        getCommandMap().register("", new SimpleCommand("r"));
-        getCommandMap().register("", new SimpleCommand("reply"));
-        getCommandMap().register("", new SimpleCommand("host"));
-        getCommandMap().register("", new SimpleCommand("coins"));
-        getCommandMap().register("", new SimpleCommand("exp"));
-        getCommandMap().register("", new SimpleCommand("rank"));
-        getCommandMap().register("", new SimpleCommand("maintenance"));
-        getCommandMap().register("", new SimpleCommand("grant"));
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-
-        String message = event.getMessage();
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (message.contains(onlinePlayer.getName())) {
-                ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(onlinePlayer.getUniqueId());
-                if (targetProfile.isNotifications()) {
-                    onlinePlayer.playSound(onlinePlayer.getLocation(), Sound.ORB_PICKUP, 1f, 1f);
-                }
-                message = message.replace(onlinePlayer.getName(), "§b@" + onlinePlayer.getName() + "§f");
-            }
-        }
-
-        TextComponent text = new TextComponent("§c⚠ ");
-        text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent(ChatUtil.prefix("&cSignaler &l" + player.getName() + " &c(action effectuée au clic)"))}));
-        text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatreport confirm;name:" + player.getName() + " message:" + message.replace("§b", "").replace("§f", "")));
-        String finalMessage = message;
-
-        Bukkit.getOnlinePlayers().forEach(player1 -> player1.spigot().sendMessage(text, new TextComponent(
-                profile.getRank().getTabPrefix().replace("&", "§") + " " + player.getName() + " §8§l» §f" + finalMessage
-        )));
-
-        event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-        if (profile.getDisplayName().equals("") || !profile.getDisplayName().equalsIgnoreCase(player.getDisplayName())) {
-            profile.setDisplayName(player.getDisplayName());
-            BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
-        }
-
-        if (profile.getRank().permissionPower() >= 10) {
-            profile.setHosts(-1);
-            if (profile.getIps().contains(player.getAddress().getHostName())) {
-                profile.getIps().add(player.getAddress().getHostName());
-                BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
-            }
-        }
-
-        profile.setLastLogin(new Date());
-        BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
-
-        if (LunarClientAPI.getInstance().isRunningLunarClient(player))
-            Bukkit.getOnlinePlayers().stream()
-                    .filter(player1 -> CommonProvider.getInstance().getProfile(player1.getUniqueId()).isStaff())
-                    .forEach(player1 -> LunarClientAPI.getInstance().overrideNametag(player1, Arrays.asList(
-                            ChatUtil.translate("&f(&cStaff Mod&f)"),
-                            ChatUtil.translate(profile.getRank().getChatPrefix() + " " + player1.getName())
-                    ), player));
-
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-
-        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-        profile.setPlayTime(profile.getPlayTime() - (profile.getLastLogin().getTime() - System.currentTimeMillis()));
-        BukkitAPI.getCommonAPI().saveProfile(player.getUniqueId(), profile);
-
-        if (BukkitAPI.getStaffManager().getFreezePlayers().contains(player.getUniqueId())) {
-            BukkitAPI.getStaffManager().getFreezePlayers().remove(player.getUniqueId());
-            Bukkit.getOnlinePlayers().stream()
-                    .filter(player1 -> CommonProvider.getInstance().getProfile(player1.getUniqueId()).isStaff())
-                    .forEach(player1 -> {
-                        player1.sendMessage(ChatUtil.prefix("&c" + player.getName() + " &fa quitté le serveur en étant &cfreeze&f."));
-                    });
-        }
-    }
-
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-
-        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(player.getUniqueId());
-
-        if (profile.getRank().permissionPower() >= 1000) {
-            player.setOp(true);
-        }
-
-        if (BukkitAPI.getPunishmentManager().getBan(player.getUniqueId()) != null) {
-            event.setKickMessage(BukkitAPI.getPunishmentManager().getKickMessage(BukkitAPI.getPunishmentManager().getBan(player.getUniqueId())));
-            event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
-        }
-        if (BukkitAPI.getPunishmentManager().getBlacklist(player.getUniqueId()) != null) {
-            event.setKickMessage(BukkitAPI.getPunishmentManager().getKickMessage(BukkitAPI.getPunishmentManager().getBlacklist(player.getUniqueId())));
-            event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
-        }
     }
 }

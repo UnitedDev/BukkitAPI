@@ -1,9 +1,8 @@
-package fr.uniteduhc.command.impl;
+package fr.uniteduhc.manager.commands;
 
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.Command;
-import fr.uniteduhc.command.param.Param;
-import fr.uniteduhc.common.CommonProvider;
+import fr.uniteduhc.command.annotations.Command;
+import fr.uniteduhc.command.annotations.Param;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.common.cache.data.Report;
 import fr.uniteduhc.menu.pagination.ConfirmationMenu;
@@ -13,6 +12,7 @@ import fr.uniteduhc.punishment.menu.ReportMenu;
 import fr.uniteduhc.utils.ChatUtil;
 import fr.uniteduhc.utils.DiscordWebhook;
 import fr.uniteduhc.utils.ItemBuilder;
+import fr.uniteduhc.utils.ProfileUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 public class PlayerCommands {
@@ -82,11 +81,11 @@ public class PlayerCommands {
                 ),
                 30
         ));
-        BukkitAPI.getCommonAPI().addReport(new Report(new Date(), UUID.randomUUID(), fromString(name), sender.getUniqueId(), " §8▪ §cChat: §f" + message.replaceFirst(":", ""), false));
+        BukkitAPI.getCommonAPI().addReport(new Report(new Date(), UUID.randomUUID(), ProfileUtils.fromString(name), sender.getUniqueId(), " §8▪ §cChat: §f" + message.replaceFirst(":", ""), false));
     }
 
     @Command(names = {"ping"})
-    public static void execute(Player sender, @Param(name = "target", defaultValue = "self") Player target) {
+    public static void execute(Player sender, @Param(name = "target", baseValue = "self") Player target) {
         if (target == sender) {
             sender.sendMessage(ChatUtil.translate("&7▎ &fVotre Ping: &a" + getPing(sender) + "ms&f."));
         } else {
@@ -110,7 +109,7 @@ public class PlayerCommands {
 
     @Command(names = {"report"})
     public static void report(Player sender, @Param(name = "target") Player target) {
-        if(target.getUniqueId().equals(sender.getUniqueId())) {
+        if (target.getUniqueId().equals(sender.getUniqueId())) {
             sender.sendMessage(ChatUtil.prefix("&cVous êtes devenu fou ?"));
             return;
         }
@@ -154,11 +153,6 @@ public class PlayerCommands {
 
     }
 
-    public static int getPing(Player player) {
-        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-        return entityPlayer.ping;
-    }
-
     @Command(names = {"lag", "tps"}, power = 39)
     public static void execute(Player sender) {
         StringBuilder sb = new StringBuilder(" ");
@@ -188,35 +182,13 @@ public class PlayerCommands {
         sender.sendMessage(" ");
     }
 
-    static String format(double tps) {
+    private static String format(double tps) {
         return ((tps > 18.0) ? ChatColor.GREEN : (tps > 16.0) ? ChatColor.YELLOW : ChatColor.RED)
                 + ((tps > 20.0) ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 20.0);
     }
 
-    public static UUID fromString(String string) {
-
-        for (Map.Entry<UUID, ProfileData> entry : CommonProvider.getInstance().players.entrySet()) {
-            UUID uuid = entry.getKey();
-            ProfileData profileData = entry.getValue();
-            if (profileData.getDisplayName().equalsIgnoreCase(string)) {
-                return uuid;
-            }
-        }
-
-        return null;
+    public static int getPing(Player player) {
+        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        return entityPlayer.ping;
     }
-
-    public static ProfileData getProfile(String string) {
-
-        for (Map.Entry<UUID, ProfileData> entry : CommonProvider.getInstance().players.entrySet()) {
-            UUID uuid = entry.getKey();
-            ProfileData profileData = entry.getValue();
-            if (profileData.getDisplayName().equalsIgnoreCase(string)) {
-                return profileData;
-            }
-        }
-
-        return null;
-    }
-
 }

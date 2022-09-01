@@ -1,7 +1,7 @@
 package fr.uniteduhc.punishment.menu;
 
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.impl.PlayerCommands;
+import fr.uniteduhc.manager.commands.PlayerCommands;
 import fr.uniteduhc.common.CommonProvider;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.common.cache.data.Report;
@@ -36,7 +36,7 @@ public class WarnsMenu extends PaginatedMenu {
     public Map<Integer, Button> getAllPagesButtons(Player p0) {
         Map<Integer, Button> buttons = new HashMap<>();
 
-        final UUID uuid = PlayerCommands.fromString(profile.getDisplayName());
+        final UUID uuid = profile.getUniqueId();
         for (Warn warn : BukkitAPI.getCommonAPI().getWarns(uuid)) {
             buttons.put(buttons.size(), new WarnButton(warn));
         }

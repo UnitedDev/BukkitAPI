@@ -1,12 +1,12 @@
-package fr.uniteduhc.command.impl;
+package fr.uniteduhc.manager.commands;
 
 import com.lunarclient.bukkitapi.LunarClientAPI;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.Command;
-import fr.uniteduhc.command.param.Param;
+import fr.uniteduhc.command.annotations.Command;
+import fr.uniteduhc.command.annotations.Param;
 import fr.uniteduhc.common.CommonProvider;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.common.cache.data.PunishmentData;
@@ -18,6 +18,7 @@ import fr.uniteduhc.punishment.menu.*;
 import fr.uniteduhc.staff.events.StaffDisableEvent;
 import fr.uniteduhc.staff.menu.FreezeMenu;
 import fr.uniteduhc.utils.ChatUtil;
+import fr.uniteduhc.utils.ProfileUtils;
 import fr.uniteduhc.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -67,13 +68,13 @@ public class ModCommands {
     }
 
     @Command(names = "ss", power = 39)
-    public static void ss(Player player, @Param(name = "player") String target) {
-        new PunishmentCategoryMenu(PlayerCommands.getProfile(target), null).openMenu(player);
+    public static void ss(Player player, @Param(name = "player") ProfileData target) {
+        new PunishmentCategoryMenu(target, null).openMenu(player);
     }
 
     @Command(names = {"c", "casier"}, power = 39)
-    public static void chech(Player player, @Param(name = "player") String target) {
-        new HistoryMenu(PlayerCommands.getProfile(target), null).openMenu(player);
+    public static void chech(Player player, @Param(name = "player") ProfileData target) {
+        new HistoryMenu(target, null).openMenu(player);
     }
 
     @Command(names = "declineban", power = 40)
@@ -122,8 +123,8 @@ public class ModCommands {
     }
 
     @Command(names = "ban", power = 40)
-    public static void ban(Player sender, @Param(name = "player") String target, @Param(name = "raison", wildcard = true) String reason) {
-        UUID uuid = PlayerCommands.fromString(target);
+    public static void ban(Player sender, @Param(name = "player") ProfileData target, @Param(name = "raison", wildcard = true) String reason) {
+        UUID uuid = target.getUniqueId();
 
         if (BukkitAPI.getPunishmentManager().getBan(uuid) != null) {
             sender.sendMessage(ChatUtil.prefix("&cCe joueur est déjà banni."));
@@ -142,8 +143,8 @@ public class ModCommands {
     }
 
     @Command(names = "tempban", power = 40)
-    public static void ban(Player sender, @Param(name = "player") String target, @Param(name = "durée") String duration, @Param(name = "raison", wildcard = true) String reason) {
-        UUID uuid = PlayerCommands.fromString(target);
+    public static void ban(Player sender, @Param(name = "player") ProfileData target, @Param(name = "durée") String duration, @Param(name = "raison", wildcard = true) String reason) {
+        UUID uuid = target.getUniqueId();
         if (BukkitAPI.getPunishmentManager().getBan(uuid) != null) {
             sender.sendMessage(ChatUtil.prefix("&cCe joueur est déjà banni."));
             return;
@@ -161,22 +162,21 @@ public class ModCommands {
     }
 
     @Command(names = "reports", power = 39)
-    public static void reports(Player sender, @Param(name = "player", defaultValue = "rien") String target) {
+    public static void reports(Player sender, @Param(name = "player", baseValue = "rien") String target) {
         if (target.equalsIgnoreCase("rien"))
             new ReportsMenu(null).openMenu(sender);
         else
-            new ReportsMenu(PlayerCommands.getProfile(target)).openMenu(sender);
+            new ReportsMenu(ProfileUtils.getProfile(target)).openMenu(sender);
     }
 
     @Command(names = "warns", power = 25)
-    public static void warns(Player sender, @Param(name = "player") String target) {
-        new WarnsMenu(PlayerCommands.getProfile(target)).openMenu(sender);
+    public static void warns(Player sender, @Param(name = "player") ProfileData target) {
+        new WarnsMenu(target).openMenu(sender);
     }
 
     @Command(names = "grants", power = 41)
-    public static void grants(Player sender, @Param(name = "player") String target) {
-        ProfileData targetProfile = PlayerCommands.getProfile(target);
-        new GrantsMenu(targetProfile).openMenu(sender);
+    public static void grants(Player sender, @Param(name = "player") ProfileData target) {
+        new GrantsMenu(target).openMenu(sender);
     }
 
     @Command(names = {"freeze"}, power = 40)
@@ -205,10 +205,7 @@ public class ModCommands {
     }
 
     @Command(names = "warn", power = 39)
-    public static void warn(Player sender, @Param(name = "player") Player target, @Param(name = "raison", wildcard = true, defaultValue = "rien") String data) {
-        ProfileData profile = BukkitAPI.getCommonAPI().getProfile(sender.getUniqueId());
-        ProfileData targetProfile = BukkitAPI.getCommonAPI().getProfile(target.getUniqueId());
-
+    public static void warn(Player sender, @Param(name = "player") Player target, @Param(name = "raison", wildcard = true, baseValue = "rien") String data) {
         new PunishWarnMenu(target).openMenu(sender);
     }
 
@@ -260,13 +257,13 @@ public class ModCommands {
     }
 
     @Command(names = "unban", power = 40)
-    public static void unban(Player sender, @Param(name = "player") String target, @Param(name = "raison", wildcard = true) String reason) {
-        if (BukkitAPI.getPunishmentManager().getBan(PlayerCommands.fromString(target)) == null) {
+    public static void unban(Player sender, @Param(name = "player") ProfileData target, @Param(name = "raison", wildcard = true) String reason) {
+        if (BukkitAPI.getPunishmentManager().getBan(target.getUniqueId()) == null) {
             sender.sendMessage(ChatUtil.prefix("&cCe joueur n'est pas banni."));
             return;
         }
 
-        PunishmentData punishment = BukkitAPI.getPunishmentManager().getBan(PlayerCommands.fromString(target));
+        PunishmentData punishment = BukkitAPI.getPunishmentManager().getBan(target.getUniqueId());
 
         punishment.getEdits().add(new PunishmentData.PunishmentEdit(punishment.getDuration(), 1000, reason, sender.getUniqueId()));
         punishment.setDuration(1000);
@@ -286,15 +283,15 @@ public class ModCommands {
     }
 
     @Command(names = "mute", power = 39)
-    public static void mute(Player sender, @Param(name = "player") String target, @Param(name = "raison", wildcard = true) String reason) {
-        if (BukkitAPI.getPunishmentManager().getMute(PlayerCommands.fromString(target)) != null) {
+    public static void mute(Player sender, @Param(name = "player") ProfileData target, @Param(name = "raison", wildcard = true) String reason) {
+        if (BukkitAPI.getPunishmentManager().getMute(target.getUniqueId()) != null) {
             sender.sendMessage(ChatUtil.prefix("&cCe joueur est déjà mute."));
             return;
         }
 
         PunishmentData data = new PunishmentData(
                 PunishmentData.PunishmentType.MUTE,
-                PlayerCommands.fromString(target),
+                target.getUniqueId(),
                 sender.getUniqueId(),
                 reason,
                 -1L
@@ -304,15 +301,15 @@ public class ModCommands {
     }
 
     @Command(names = "tempmute", power = 39)
-    public static void mute(Player sender, @Param(name = "player") String target, @Param(name = "durée") String duration, @Param(name = "raison", wildcard = true) String reason) {
-        if (BukkitAPI.getPunishmentManager().getMute(PlayerCommands.fromString(target)) != null) {
+    public static void mute(Player sender, @Param(name = "player") ProfileData target, @Param(name = "durée") String duration, @Param(name = "raison", wildcard = true) String reason) {
+        if (BukkitAPI.getPunishmentManager().getMute(target.getUniqueId()) != null) {
             sender.sendMessage(ChatUtil.prefix("&cCe joueur est déjà mute."));
             return;
         }
 
         PunishmentData data = new PunishmentData(
                 PunishmentData.PunishmentType.MUTE,
-                PlayerCommands.fromString(target),
+                target.getUniqueId(),
                 sender.getUniqueId(),
                 reason,
                 TimeUtil.getDuration(duration)
@@ -322,13 +319,13 @@ public class ModCommands {
     }
 
     @Command(names = "unmute", power = 40)
-    public static void unmute(Player sender, @Param(name = "player") String target, @Param(name = "raison", wildcard = true) String reason) {
-        if (BukkitAPI.getPunishmentManager().getMute(PlayerCommands.fromString(target)) == null) {
+    public static void unmute(Player sender, @Param(name = "player") ProfileData target, @Param(name = "raison", wildcard = true) String reason) {
+        if (BukkitAPI.getPunishmentManager().getMute(target.getUniqueId()) == null) {
             sender.sendMessage(ChatUtil.prefix("&cCe joueur n'est pas mute."));
             return;
         }
 
-        PunishmentData punishment = BukkitAPI.getPunishmentManager().getMute(PlayerCommands.fromString(target));
+        PunishmentData punishment = BukkitAPI.getPunishmentManager().getMute(target.getUniqueId());
 
         punishment.getEdits().add(new PunishmentData.PunishmentEdit(punishment.getDuration(), 1000, reason, sender.getUniqueId()));
         punishment.setDuration(1000);
@@ -367,7 +364,7 @@ public class ModCommands {
                 .collect(Collectors.toList());
 
         profiles.forEach(data -> {
-            UUID uuid = PlayerCommands.fromString(data.getDisplayName());
+            UUID uuid = data.getUniqueId();
             String server = BukkitAPI.getCommonAPI().getServerCache().getPlayers().get(uuid);
             String executorDisplay = data.getRank().getTabPrefix() + " " + data.getDisplayName();
             if (!data.isVanish())
@@ -379,7 +376,7 @@ public class ModCommands {
         player.sendMessage(ChatUtil.translate("&7&m--------------------------------"));
     }
 
-    public static GameMode getGamemode(String str) {
+    private static GameMode getGamemode(String str) {
         if (str.equalsIgnoreCase("creative") || str.equalsIgnoreCase("c") || str.equals("1")) {
             return GameMode.CREATIVE;
         } else if (str.equalsIgnoreCase("survival") || str.equalsIgnoreCase("s") || str.equals("0")) {
@@ -393,7 +390,7 @@ public class ModCommands {
         }
     }
 
-    public static String niceFormat(GameMode gamemode) {
+    private static String niceFormat(GameMode gamemode) {
         String name = gamemode.name();
         return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }

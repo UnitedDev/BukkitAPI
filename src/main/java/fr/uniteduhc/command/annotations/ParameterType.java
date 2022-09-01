@@ -1,4 +1,4 @@
-package fr.uniteduhc.command.param;
+package fr.uniteduhc.command.annotations;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

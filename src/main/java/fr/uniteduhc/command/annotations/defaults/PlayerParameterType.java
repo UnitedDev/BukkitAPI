@@ -1,6 +1,6 @@
-package fr.uniteduhc.command.param.defaults;
+package fr.uniteduhc.command.annotations.defaults;
 
-import fr.uniteduhc.command.param.ParameterType;
+import fr.uniteduhc.command.annotations.ParameterType;
 import fr.uniteduhc.utils.ChatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;

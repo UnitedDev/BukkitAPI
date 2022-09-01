@@ -1,4 +1,4 @@
-package fr.uniteduhc.command.param;
+package fr.uniteduhc.command.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +13,7 @@ public @interface Param {
 
     boolean wildcard() default (false);
 
-    String defaultValue() default ("");
+    String baseValue() default ("");
 
     String[] tabCompleteFlags() default ("");
 

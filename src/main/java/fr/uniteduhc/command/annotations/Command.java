@@ -1,4 +1,4 @@
-package fr.uniteduhc.command;
+package fr.uniteduhc.command.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

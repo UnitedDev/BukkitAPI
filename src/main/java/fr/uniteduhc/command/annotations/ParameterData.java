@@ -1,4 +1,4 @@
-package fr.uniteduhc.command.param;
+package fr.uniteduhc.command.annotations;
 
 import lombok.Getter;
 
@@ -18,7 +18,7 @@ public final class ParameterData {
     public ParameterData(Param paramAnnotation, Class<?> parameterClass) {
         this.name = paramAnnotation.name();
         this.wildcard = paramAnnotation.wildcard();
-        this.defaultValue = paramAnnotation.defaultValue();
+        this.defaultValue = paramAnnotation.baseValue();
         this.tabCompleteFlags = paramAnnotation.tabCompleteFlags();
         this.parameterClass = parameterClass;
     }

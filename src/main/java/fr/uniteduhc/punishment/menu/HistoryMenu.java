@@ -1,7 +1,7 @@
 package fr.uniteduhc.punishment.menu;
 
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.impl.PlayerCommands;
+import fr.uniteduhc.manager.commands.PlayerCommands;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.common.cache.data.PunishmentData;
 import fr.uniteduhc.menu.Button;
@@ -79,7 +79,7 @@ public class HistoryMenu extends PaginatedMenu {
     public Map<Integer, Button> getAllPagesButtons(Player player) {
         Map<Integer, Button> buttons = new HashMap<>();
 
-        for (PunishmentData punishment : BukkitAPI.getCommonAPI().getPunishments(PlayerCommands.fromString(target.getDisplayName())))
+        for (PunishmentData punishment : BukkitAPI.getCommonAPI().getPunishments(target.getUniqueId()))
             if (type == punishment.getPunishmentType())
                 buttons.put(buttons.size(), new PunishmentButton(punishment));
 

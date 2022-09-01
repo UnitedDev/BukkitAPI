@@ -47,7 +47,7 @@ public class GrantsMenu extends PaginatedMenu {
         public ItemStack getButtonItem(Player p0) {
             ProfileData data = null;
             if (!grant.getIssuer().toString().contains("00000")) {
-                data = BukkitAPI.getCommonAPI().getProfile(p0.getUniqueId());
+                data = BukkitAPI.getCommonAPI().getProfile(grant.getIssuer());
             }
             return new ItemBuilder(Material.WOOL).setDurability(grant.isActive() ? 5 : 14)
                     .setName("&c" + grant.getGrantId().toString().substring(0, 6))

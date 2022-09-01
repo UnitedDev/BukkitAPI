@@ -1,7 +1,7 @@
 package fr.uniteduhc.punishment.menu;
 
 import fr.uniteduhc.BukkitAPI;
-import fr.uniteduhc.command.impl.PlayerCommands;
+import fr.uniteduhc.manager.commands.PlayerCommands;
 import fr.uniteduhc.common.cache.data.ProfileData;
 import fr.uniteduhc.common.cache.data.PunishmentData;
 import fr.uniteduhc.menu.Button;
@@ -85,7 +85,7 @@ public class PunishmentMenu extends PaginatedMenu {
             }
 
             new ConfirmationMenu(() -> {
-                int count = (int) BukkitAPI.getCommonAPI().getPunishments(PlayerCommands.fromString(target.getDisplayName())).stream()
+                int count = (int) BukkitAPI.getCommonAPI().getPunishments(target.getUniqueId()).stream()
                         .filter(pd -> pd.getReason().equalsIgnoreCase(punishments.getDisplay()))
                         .count();
 
@@ -99,7 +99,7 @@ public class PunishmentMenu extends PaginatedMenu {
 
                 PunishmentData punishmentData = new PunishmentData(
                         punishmentAdapter.getType(),
-                        PlayerCommands.fromString(target.getDisplayName()),
+                        target.getUniqueId(),
                         player.getUniqueId(),
                         punishments.getDisplay(),
                         punishmentAdapter.getDuration()
